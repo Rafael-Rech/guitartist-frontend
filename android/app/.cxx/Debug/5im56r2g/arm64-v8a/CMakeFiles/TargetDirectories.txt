@@ -1,0 +1,2 @@
+C:/Users/rafae/Faculdade/TCC/FrontEnd/tcc/android/app/.cxx/Debug/5im56r2g/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/rafae/Faculdade/TCC/FrontEnd/tcc/android/app/.cxx/Debug/5im56r2g/arm64-v8a/CMakeFiles/rebuild_cache.dir
