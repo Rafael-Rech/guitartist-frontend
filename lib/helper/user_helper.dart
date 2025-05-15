@@ -24,11 +24,12 @@ abstract class UserHelper {
   static Future<User?> getUser() async {
     Database database = await db;
     List<Map> listMap = await database.rawQuery("SELECT * FROM $userTable");
-    print("listMap: $listMap, ${listMap.runtimeType}");
+    print("listMap no getUser local e seu tipo: $listMap, ${listMap.runtimeType}");
     Map map = Map.of(listMap.first);
     if (listMap.isNotEmpty && map.containsKey("id")) {
       List<Lesson> lessons = await LessonHelper.getLessons(map["id"]);
       // map.putIfAbsent("lessons", () => lessons);
+      print("Lessons no banco local: $lessons");
       map["lessons"] = lessons;
       return mapToUser(map);
     }
@@ -37,6 +38,7 @@ abstract class UserHelper {
 
   static Future<void> deleteUser() async {
     Database database = await db;
+    await database.delete(LessonHelper.lessonTable); 
     await database.delete(userTable);
   }
 
@@ -62,10 +64,17 @@ abstract class UserHelper {
           lessons.add(LessonHelper.mapToLesson(lesson));
         } else if (lesson.runtimeType == Lesson) {
           lessons.add(lesson);
+        } else {
+          try{
+            lesson = lesson as Map<String, dynamic>;
+          } on Exception{
+            throw Exception("Erro ao decodificar progresso de lição recebido");
+          }
+          lesson = LessonHelper.mapToLesson(lesson);
+          lessons.add(lesson);
         }
       }
     }
-    print("map: $map");
 
     return User(
       map["name"],

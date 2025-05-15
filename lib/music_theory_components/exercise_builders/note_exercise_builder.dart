@@ -97,8 +97,8 @@ class NoteExerciseBuilder implements ExerciseBuilder {
         List<Option> options = _generateOptions(Option(true, noteName), "name");
         question = "Qual é a nota que está sendo tocada?";
 
-        //         final path = note.audioPaths[_rng.nextInt(note.audioPaths.length)];
-        final path = "";
+        final location = note.locations[_rng.nextInt(note.locations.length)];
+        final path = location.audioPath;
         return ListenExercise(question, options, path);
       case ELessonType.quiz:
         NoteLocation location =

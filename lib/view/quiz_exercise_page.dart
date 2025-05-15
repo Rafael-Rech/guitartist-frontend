@@ -63,15 +63,15 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
     final appBar = AppBar(
       backgroundColor: const Color.fromARGB(255, 217, 68, 99),
       automaticallyImplyLeading: false,
-      actions: [
-        IconButton(
-          icon: Icon(Icons.settings),
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()));
-          },
-        )
-      ],
+      // actions: [
+      //   IconButton(
+      //     icon: Icon(Icons.settings),
+      //     onPressed: () {
+      //       Navigator.push(context,
+      //           MaterialPageRoute(builder: (context) => const SettingsPage()));
+      //     },
+      //   )
+      // ],
       foregroundColor: MyColors.main1,
     );
 
@@ -144,8 +144,8 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
     );
   }
 
-  Future<void> _updateProgress(int answersProvided, int correctAnswersProvided,
-      Duration timeSpent) async {
+  Future<void> _updateProgress(
+      int precisionInThisAttempt, Duration timeSpent) async {
     User? user = await UserHelper.getUser();
     if (user == null) {
       return;
@@ -159,8 +159,7 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
     int averagePrecision, proficiency;
     if (lesson == null) {
       // It's the first time the user completes this lesson
-      averagePrecision = correctAnswersProvided ~/ answersProvided;
-
+      averagePrecision = precisionInThisAttempt;
       proficiency = averagePrecision ~/ timeSpent.inSeconds;
       lesson = Lesson(
         widget.subject,
@@ -170,22 +169,35 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
         averagePrecision,
         proficiency,
       );
+      await LessonHelper.saveLesson(lesson, userId);
     } else {
       // The user has already completed the lesson
       int numberOfTries = lesson.numberOfTries;
-      averagePrecision = ((numberOfTries * lesson.averagePrecision) +
-          (correctAnswersProvided ~/ answersProvided));
+      averagePrecision =
+          ((numberOfTries * lesson.averagePrecision) + precisionInThisAttempt);
       averagePrecision = averagePrecision ~/ (numberOfTries + 1);
-      proficiency =
-          (averagePrecision ~/ timeSpent.inSeconds) * (numberOfTries) ~/ 100;
+      // proficiency = ((precisionInThisAttempt / timeSpent.inSeconds) + lesson.proficiency).ceil();
+      proficiency = ((precisionInThisAttempt / timeSpent.inSeconds) * 10 +
+              lesson.proficiency)
+          .ceil();
       if (proficiency > 100) {
         proficiency = 100;
       }
       lesson.numberOfTries++;
       lesson.averagePrecision = averagePrecision;
       lesson.proficiency = proficiency;
+      await LessonHelper.updateLesson(lesson, userId);
     }
-    await LessonHelper.updateLesson(lesson, userId);
+
+    print("");
+    print("Lesson finished:");
+    print("Id = ${widget.id}");
+    print("Duration = ${timeSpent.inSeconds}s");
+    print("Average Precision = $averagePrecision");
+    print("Number of tries = ${lesson.numberOfTries}");
+    print("Proficiency = $proficiency");
+    print("");
+
     user = await UserHelper.getUser();
     if (user == null) {
       return;
@@ -233,24 +245,47 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
                   }
                 }
                 if (widget.index == widget.exercises.length - 1) {
+                  final totalTimeSpent =
+                      widget.timeSpent + DateTime.now().difference(startTime);
+                  final precision = (((widget.correctAnswersProvided + 1) /
+                              (widget.answersProvided + numberOfAnswers)) *
+                          100)
+                      .ceil();
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text("Boa :D"),
+                      
+                      title: Text(
+                        "Parabéns",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      content: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 5.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Você concluiu a lição!",
+                              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text("Tempo: ${totalTimeSpent.inSeconds}s", textAlign: TextAlign.center, style: TextStyle(fontSize: 16.0)),
+                            Text("Precisão: $precision%", textAlign : TextAlign.center, style: TextStyle(fontSize: 16.0)),
+                          ],
+                        ),
+                      ),
                       actions: [
                         TextButton(
                           onPressed: () {
-                            _updateProgress(
-                                widget.answersProvided + numberOfAnswers,
-                                widget.correctAnswersProvided + 1,
-                                widget.timeSpent +
-                                    DateTime.now().difference(startTime));
+                            _updateProgress(precision, totalTimeSpent);
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
                                     builder: (context) => HomePage()),
                                 (route) => false);
                           },
-                          child: Text("Voltar ao início"),
+                          child: Text("Voltar ao início", style: TextStyle(color: MyColors.main6),),
                         )
                       ],
                     ),

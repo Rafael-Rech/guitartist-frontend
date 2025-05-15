@@ -39,7 +39,7 @@ class _InitialPageState extends State<InitialPage> {
                   height: 150,
                 ),
                 Text(
-                  "Guitartist \n(nome provisório)",
+                  "Guitartist",
                   style: TextStyle(
                     color: Color.fromARGB(255, 217, 68, 99),
                     fontSize: 30.0,

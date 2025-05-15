@@ -7,7 +7,6 @@ class Note {
     this.names,
     this.alternativeNames,
     this.frequencies,
-    this.audioPaths,
     this.locations,
   );
 
@@ -15,7 +14,6 @@ class Note {
   List<String> names;
   List<String>? alternativeNames;
   List<int> frequencies;
-  List<String> audioPaths;
   List<NoteLocation> locations;
 
   @override

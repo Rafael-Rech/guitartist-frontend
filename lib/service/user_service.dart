@@ -170,15 +170,29 @@ Future<bool> getUserFromServer() async {
     return false;
   }
 
-  print(response.statusCode);
+  print("Status code ao obter: ${response.statusCode}");
   if (response.statusCode == 200) {
-    print("Body: ${response.body}");
-    print("Tipo: ${response.body.runtimeType}");
+    print("Body ao obter: ${response.body}");
+    print("Tipo do body: ${response.body.runtimeType}");
+    print("");
+    print("Convertendo o json para o userServer");
     User userServer = UserHelper.mapToUser(json.decode(response.body));
     if (DateConverter.stringToDate(userLocal.time)
+        .subtract(Duration(days: 1))
         .isBefore(DateConverter.stringToDate(userServer.time))) {
       userServer.password = userLocal.password;
+      print("");
+      print("");
+      print("USER DO SERVER ANTES DE SALVAR: $userServer");
+      print("");
+      print("");
       await UserHelper.saveUser(userServer);
+    } else {
+      print("");
+      print("");
+      print("DATA NÃO BATEU");
+      print("");
+      print("");
     }
     return true;
   }
@@ -218,8 +232,8 @@ Future<String> update(User user) async {
     return "Couldn't reach the server";
   }
 
-  print(response.body);
-  print(response.statusCode);
+  print("Body do update: ${response.body}");
+  print("Status do update: ${response.statusCode}");
 
   if (response.statusCode == 200) {
     // Created
@@ -289,7 +303,7 @@ Future<String> changePassword(String password) async {
   user.password = password;
 
   final serverResponse = await update(user);
-  if(serverResponse == "OK"){
+  if (serverResponse == "OK") {
     await UserHelper.saveUser(user);
     return "OK";
   }

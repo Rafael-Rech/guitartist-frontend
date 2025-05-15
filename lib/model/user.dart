@@ -15,17 +15,27 @@ class User {
   int noteRepresentation;
 
   Map<String, dynamic> toMap() {
+    List<Map> mapLessons = [];
+    for(Lesson l in lessons){
+      mapLessons.add(l.toMap());
+    }
     Map<String, dynamic> map = {
       "name": name,
       "password": password,
       "email": email,
       "id" : id,
       "appVersion": appVersion,
-      "lessons": lessons,
+      // "lessons": lessons,
+      "lessons": mapLessons,
       "time": time,
       "profilePicture" : profilePicture,
       "noteRepresentation" : noteRepresentation
     };
     return map;
+  }
+
+  @override
+  String toString(){
+    return "(id = $id, lessons = $lessons)";
   }
 }

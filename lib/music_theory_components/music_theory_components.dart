@@ -141,7 +141,13 @@ abstract class MusicTheoryComponents {
       for (int fret = 0; fret < 22; fret++) {
         // print("string = $string, fret = $fret, frequency = $currentFrequency");
         currentFrequency = listOfFrequencies[currentNoteIndex][currentOctave];
-        listOfLocations[currentNoteIndex].add(NoteLocation(string, fret, currentFrequency));
+        // String audioPath = "assets/audio/notes/$string$fret.wav";
+        String fretString = fret.toString().padLeft(2, '0');
+        String audioPath = "assets/audio/notes/$string$fretString.mp3";
+
+        // String audioPath = "assets/audio/notes/415.wav";
+        // String audioPath = "assets/audio/beep.wav";
+        listOfLocations[currentNoteIndex].add(NoteLocation(string, fret, currentFrequency, audioPath, currentOctave));
         currentNoteIndex = (currentNoteIndex + 1) % 12;
         if(currentNoteIndex == 0){
           currentOctave++;
@@ -158,7 +164,6 @@ abstract class MusicTheoryComponents {
         listOfNames[id],
         listOfAlternativeNames[id],
         listOfFrequencies[id],
-        [],
         listOfLocations[id],
       );
       //           print(note);
