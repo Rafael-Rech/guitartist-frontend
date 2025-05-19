@@ -14,7 +14,6 @@ class MainMenuOption extends StatelessWidget {
   final String optionText;
   final bool reverse;
   final Widget? route;
-  // final Route<Object?>? route;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +71,6 @@ class MainMenuOption extends StatelessWidget {
                           image: optionImage,
                           fit: BoxFit.fitHeight,
                           alignment: FractionalOffset.centerLeft,
-                          // alignment: Alignment(-1.5, 0.0),
                         ),
                       ),
                     ),
@@ -85,7 +83,6 @@ class MainMenuOption extends StatelessWidget {
                           image: optionImage,
                           fit: BoxFit.fitHeight,
                           alignment: FractionalOffset.centerRight,
-                          // alignment: Alignment(-1.5, 0.0),
                         ),
                       ),
                     ),
@@ -102,6 +99,7 @@ class MainMenuOption extends StatelessWidget {
         break;
       case 3:
       // Square button
+      //TODO: In some screens, it can cause a size overflow
         button = Container(
           width: MediaQuery.of(context).size.width * 0.4,
           height: MediaQuery.of(context).size.width * 0.4,
@@ -123,8 +121,6 @@ class MainMenuOption extends StatelessWidget {
                       image: optionImage,
                       fit: BoxFit.fitHeight,
                       alignment: FractionalOffset.center,
-
-                      // alignment: FractionalOffset.topLeft,
                     ),
                   ),
                 ),

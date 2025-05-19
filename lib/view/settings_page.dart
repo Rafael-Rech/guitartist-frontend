@@ -26,15 +26,20 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     List<Widget> buttonsWithSizedBoxes = [];
 
-    for(MyTextButton button in _representationButtons){
+    for (MyTextButton button in _representationButtons) {
       buttonsWithSizedBoxes.add(button);
-      buttonsWithSizedBoxes.add(SizedBox(height: 10.0,));
+      buttonsWithSizedBoxes.add(SizedBox(
+        height: 10.0,
+      ));
     }
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: MyColors.main5,
-        title: Text("CONFIGURAÇÕES", style: TextStyle(color: MyColors.neutral2),),
+        title: Text(
+          "CONFIGURAÇÕES",
+          style: TextStyle(color: MyColors.neutral2),
+        ),
         centerTitle: true,
         iconTheme: IconThemeData(color: MyColors.neutral2),
       ),
@@ -43,7 +48,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-                  // Volume sliders
+                  //TODO: Volume sliders
                   const SizedBox(
                     height: 10.0,
                   ),
@@ -55,12 +60,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   Divider(
                     height: 50.0,
                   ),
-                  Text("Representação das notas", style: TextStyle(fontSize: 26.0),),
+                  Text(
+                    "Representação das notas",
+                    style: TextStyle(fontSize: 26.0),
+                  ),
                   const SizedBox(
                     height: 10.0,
                   ),
                 ] +
-                // (_representationButtons),
                 (buttonsWithSizedBoxes),
           ),
         ),
@@ -77,7 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
       User? user = await UserHelper.getUser();
       if (user != null) {
         highlightedButton = user.noteRepresentation;
-      } else if (mounted){
+      } else if (mounted) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -126,7 +133,8 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _changeRepresentation(int representation) async {
     showDialog(
         context: context,
-        builder: (context) => Center(child: CircularProgressIndicator(color: MyColors.main7)),
+        builder: (context) =>
+            Center(child: CircularProgressIndicator(color: MyColors.main7)),
         barrierDismissible: false);
     User? user = await UserHelper.getUser();
 
@@ -159,8 +167,10 @@ class _SettingsPageState extends State<SettingsPage> {
     }
 
     user!.noteRepresentation = representation;
-    await update(user);
-    await UserHelper.saveUser(user);
+    final String response = await update(user);
+    if (response == "OK") {
+      await UserHelper.saveUser(user);
+    }
     if (mounted) {
       Navigator.pop(context);
     }

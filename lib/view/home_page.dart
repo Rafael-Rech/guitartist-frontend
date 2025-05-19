@@ -7,7 +7,6 @@ import 'package:tcc/view/menu_page.dart';
 import 'package:tcc/view/metronome_page.dart';
 import 'package:tcc/view/settings_page.dart';
 import 'package:tcc/view/tuner_page.dart';
-// import 'package:tcc/view/query_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,25 +35,6 @@ class _HomePageState extends State<HomePage> {
         foregroundColor: MyColors.main1,
       ),
       backgroundColor: Colors.white,
-      // body: Center(
-      //   child: Column(
-      //     mainAxisAlignment: MainAxisAlignment.center,
-      //     children: <Widget>[
-      //       TextButton(
-      //         onPressed: () => Navigator.push(context,
-      //             MaterialPageRoute(builder: (context) => const QueryPage(0))),
-      //         style: TextButton.styleFrom(backgroundColor: Colors.lime),
-      //         child: const Text("GET ALL"),
-      //       ),
-      //       TextButton(
-      //         onPressed: () => Navigator.push(context,
-      //             MaterialPageRoute(builder: (context) => const QueryPage(1))),
-      //         style: TextButton.styleFrom(backgroundColor: Colors.lime),
-      //         child: const Text("GET BY ID"),
-      //       ),
-      //     ],
-      //   ),
-      // ),
       body: SingleChildScrollView(
         child: Center(
           child: Column(

@@ -69,8 +69,6 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
         labelText: widget.labelText,
         labelStyle: TextStyle(color: MyColors.secondary8),
         enabledBorder: widget.border,
-        // enabledBorder: ,
-        // constraints: BoxConstraints.expand(),
         focusColor: MyColors.secondary5,
         suffixIcon: suffixIcon,
         fillColor: widget.fillColor,

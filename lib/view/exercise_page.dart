@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:tcc/model/Enum/e_subject.dart';
 import 'package:tcc/music_theory_components/exercise.dart';

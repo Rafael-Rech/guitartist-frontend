@@ -39,7 +39,7 @@ class _InitialPageState extends State<InitialPage> {
                   height: 150,
                 ),
                 Text(
-                  "Guitartist \n(nome provisório)",
+                  "Guitartist",
                   style: TextStyle(
                     color: Color.fromARGB(255, 217, 68, 99),
                     fontSize: 30.0,
@@ -64,7 +64,6 @@ class _InitialPageState extends State<InitialPage> {
 
   void checkLogin() async {
     if (await getUserFromServer()) {
-      //Logou
       if (mounted) {
         Navigator.of(context).push(_createAnimatedRoute(HomePage()));
       }
@@ -73,7 +72,6 @@ class _InitialPageState extends State<InitialPage> {
         bottomSheetContent = null;
       });
     } else {
-      //Não logou
       setState(() {
         bottomSheetContent = [
           SizedBox(
@@ -87,7 +85,6 @@ class _InitialPageState extends State<InitialPage> {
                 shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
                     side: const BorderSide(
-                      // color: Colors.grey,
                       color: Color.fromARGB(255, 217, 68, 99),
                       width: 1,
                     ),
@@ -100,7 +97,6 @@ class _InitialPageState extends State<InitialPage> {
                 style: TextStyle(
                   fontSize: 20,
                   color: Colors.grey,
-                  // color: Color.fromARGB(255, 217, 68, 99),
                 ),
               ),
             ),
@@ -117,7 +113,6 @@ class _InitialPageState extends State<InitialPage> {
                 shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
                     side: const BorderSide(
-                      // color: Colors.grey,
                       color: Color.fromARGB(255, 217, 68, 99),
                       width: 1,
                     ),
@@ -130,7 +125,6 @@ class _InitialPageState extends State<InitialPage> {
                 style: TextStyle(
                   fontSize: 20,
                   color: Colors.grey,
-                  // color: Color.fromARGB(255, 217, 68, 99),
                 ),
               ),
             ),
@@ -140,7 +134,6 @@ class _InitialPageState extends State<InitialPage> {
 
         if (context.mounted) {
           bottomSheet = Container(
-            // height: MediaQuery.of(),
             color: Colors.white,
             width: MediaQuery.of(context).size.width,
             child: Column(

@@ -97,9 +97,9 @@ class NoteExerciseBuilder implements ExerciseBuilder {
         List<Option> options = _generateOptions(Option(true, noteName), "name");
         question = "Qual é a nota que está sendo tocada?";
 
-        //         final path = note.audioPaths[_rng.nextInt(note.audioPaths.length)];
-        final path = "";
-        return ListenExercise(question, options, path);
+        final location = note.locations[_rng.nextInt(note.locations.length)];
+        final path = location.audioPath;
+        return ListenExercise(question, options, [path], false);
       case ELessonType.quiz:
         NoteLocation location =
             note.locations[_rng.nextInt(note.locations.length)];
@@ -128,19 +128,11 @@ class NoteExerciseBuilder implements ExerciseBuilder {
         } else {
           // Play the note on a specific string and fret
           int position = 0;
-          print("");
-          print("Locations: ${note.locations}");
-          print("");
-
           if (note.locations.isEmpty) {
             throw Exception("Empty list of locations");
           }
-
           position = _rng.nextInt(note.locations.length);
-
-          // Atribuir cada casa a uma das frequências
           late NoteLocation location = note.locations[position];
-
           final int correctFrequency = location.frequency;
           frequenciesSequency.add(<int>[correctFrequency]);
           question =

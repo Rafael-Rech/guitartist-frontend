@@ -9,6 +9,7 @@ import 'package:tcc/music_theory_components/lesson_data/interval_lessons.dart';
 import 'package:tcc/music_theory_components/lesson_data/lesson_data.dart';
 import 'package:tcc/music_theory_components/lesson_data/note_lessons.dart';
 import 'package:tcc/music_theory_components/lesson_data/scale_lessons.dart';
+import 'package:tcc/service/user_service.dart';
 import 'package:tcc/view/components/lesson_menu_button.dart';
 import 'package:tcc/view/login_page.dart';
 import 'package:tcc/view/settings_page.dart';
@@ -25,6 +26,7 @@ class MenuPage extends StatefulWidget {
 class _MenuPageState extends State<MenuPage> {
   List<LessonData> lessonData = [];
   List<Lesson> lessons = [];
+  bool loaded = false;
   @override
   void initState() {
     super.initState();
@@ -58,7 +60,8 @@ class _MenuPageState extends State<MenuPage> {
       body: SingleChildScrollView(
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment:
+                (loaded ? MainAxisAlignment.start : MainAxisAlignment.center),
             crossAxisAlignment: CrossAxisAlignment.center,
             children: buildExerciseButtons(),
           ),
@@ -86,6 +89,7 @@ class _MenuPageState extends State<MenuPage> {
 
   void _loadProgress() async {
     _loadLessonData();
+    await getUserFromServer();
     User? user = await UserHelper.getUser();
     if (user == null) {
       if (mounted) {
@@ -112,21 +116,33 @@ class _MenuPageState extends State<MenuPage> {
       return;
     }
     lessons = user.lessons;
+    loaded = true;
+    setState(() {});
   }
 
   List<Widget> buildExerciseButtons() {
+    if (!loaded) {
+      return [
+        SizedBox(
+            child: Center(
+                child: CircularProgressIndicator(
+          color: MyColors.main7,
+        )))
+      ];
+    }
+
     List<Widget> buttons = [];
-    
-    String lastId = ""; 
+
+    String lastId = "";
 
     for (int i = 0; i < lessonData.length; i++) {
       final data = lessonData[i];
       Lesson? lastLessonProgress;
       Lesson? currentLessonProgress;
-      for(Lesson progress in lessons){
-        if(progress.id == lastId){
+      for (Lesson progress in lessons) {
+        if (progress.id == lastId) {
           lastLessonProgress = progress;
-        } else if(progress.id == data.id){
+        } else if (progress.id == data.id) {
           currentLessonProgress = progress;
         }
       }
@@ -135,21 +151,34 @@ class _MenuPageState extends State<MenuPage> {
         height: 20.0,
       ));
 
+
       buttons.add(LessonMenuButton(
         lessonName: data.name,
         lessonId: data.id,
         width: MediaQuery.of(context).size.width * 0.8,
-        locked: ((i != 0) && (lastLessonProgress == null || lastLessonProgress.proficiency < 70)),
+        locked: ((i != 0) &&
+            (lastLessonProgress == null ||
+                lastLessonProgress.proficiency < 70)),
         subject: widget.subject,
         components: data.components,
         highlightedComponents: data.highlightedComponents,
-        precision: (currentLessonProgress == null)? 0 : currentLessonProgress.averagePrecision,
-        proficiency: (currentLessonProgress == null)? 0 : currentLessonProgress.proficiency,
-        tries: (currentLessonProgress == null)? 0 : currentLessonProgress.numberOfTries,
+        precision: (currentLessonProgress == null)
+            ? 0
+            : currentLessonProgress.averagePrecision,
+        proficiency: (currentLessonProgress == null)
+            ? 0
+            : currentLessonProgress.proficiency,
+        tries: (currentLessonProgress == null)
+            ? 0
+            : currentLessonProgress.numberOfTries,
       ));
 
       lastId = data.id;
     }
+
+    buttons.add(SizedBox(
+      height: 50.0,
+    ));
 
     return buttons;
   }

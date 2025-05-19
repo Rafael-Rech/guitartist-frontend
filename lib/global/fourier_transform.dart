@@ -6,11 +6,10 @@ class FourierTransform{
   FourierTransform._(this._fft);
 
   static FourierTransform? _instance;
-  Radix2FFT? _fft;
+  final Radix2FFT? _fft;
 
   static FourierTransform get instance{
     _instance ??= FourierTransform._(Radix2FFT(32768));
-    // _instance ??= FourierTransform._(Radix2FFT(1024));
     return _instance!;
   }
 

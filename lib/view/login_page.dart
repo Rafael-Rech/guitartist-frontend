@@ -52,7 +52,6 @@ class _LoginPageState extends State<LoginPage> {
       (widget.isRegistering) ? "REGISTRO" : "LOGIN",
       style: TextStyle(
         color: MyColors.neutral2,
-        // color: MyColors.main5,
         fontSize: 26,
       ),
     );
@@ -87,22 +86,13 @@ class _LoginPageState extends State<LoginPage> {
       focusNode: emailFocusnode,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          // return createAlert("INSIRA UM E-MAIL", "E-mail é um campo obrigatório!", []);
-
-          // emailFocusnode.requestFocus();
           return "E-mail é um campo obrigatório!";
         }
 
         final RegExp regex = RegExp(
             r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-        // final RegExp regex = RegExp(r"^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$",
-        // caseSensitive: false);
 
         if (!regex.hasMatch(value)) {
-          // return createAlert("INSIRA UM E-MAIL VÁLIDO",
-          //     "Este e-mail não está no formato correto!", []);
-          //
-          // emailFocusnode.requestFocus();
           return "Este e-mail não está no formato correto!";
         }
 
@@ -125,9 +115,6 @@ class _LoginPageState extends State<LoginPage> {
       fillColor: MyColors.secondary2,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          // return createAlert(
-          //     "INSIRA UMA SENHA", "Senha é um campo obrigatório!", []);
-
           return "Senha é um campo obrigatório!";
         }
 
@@ -198,7 +185,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     columnChildren = [
-      // const SizedBox(height: 30),
       Container(
         height: 80,
         color: MyColors.main5,
@@ -207,7 +193,6 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Image(
               image: const AssetImage("assets/imgs/mainIconCropped.png"),
-              // width: MediaQuery.of(context).size.width * 0.4,
               fit: BoxFit.fitHeight,
             ),
             title,
@@ -226,7 +211,6 @@ class _LoginPageState extends State<LoginPage> {
       MyTextButton(
         onPressed: mainButtonFunction,
         text: mainButtonText,
-        // backgroundColor: MyColors.secondary7,
         textColor: MyColors.neutral5,
         borderColor: MyColors.main6,
         fontSize: 30,
@@ -236,14 +220,6 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     return Scaffold(
-      // appBar: AppBar(
-      //   leading: const Image(image: AssetImage("assets/imgs/mainIcon.png")),
-      //   title: title,
-      //   centerTitle: true,
-      //   backgroundColor: ThemeData().scaffoldBackgroundColor,
-      //   elevation: 0.0,
-      // ),
-      // body: const Center(child: Text("'-'")),
       backgroundColor: MyColors.neutral1,
       body: SingleChildScrollView(
           child: Form(
@@ -284,27 +260,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
     final String email = emailController.text;
-    // if (email.isEmpty) {
-    //   return createAlert(
-    //       "INSIRA UM E-MAIL", "E-mail é um campo obrigatório!", []);
-    // }
-    // final RegExp regex = RegExp(
-    //     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-
-    // // final RegExp regex =
-    // // RegExp("/^[a-z0-9.]+@[a-z0-9]+\\.[a-z]+\\.([a-z]+)?\$/i");
-
-    // if (!regex.hasMatch(email)) {
-    //   return createAlert("INSIRA UM E-MAIL VÁLIDO",
-    //       "Este e-mail não está no formato correto!", []);
-    // }
-
     final String password = passwordController.text;
-    // if (password.isEmpty) {
-    //   return createAlert(
-    //       "INSIRA UMA SENHA", "Senha é um campo obrigatório!", []);
-    // }
-
     waitingForResponse = true;
     showDialog(
         context: context,
@@ -353,55 +309,8 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
     final String username = usernameController.text;
-    // if (username.isEmpty) {
-    //   // return createAlert("INSIRA UM NOME DE USUÁRIO", "Nome é um campo obrigatório!", []);
-
-    //   usernameFocusnode.requestFocus();
-    //   return;
-    // }
-
-    // // final a = TextField(
-    // //   decoration: InputDecoration(errorText: "a"),
-    // // );
-
     final String email = emailController.text;
-    // if (email.isEmpty) {
-    //   // return createAlert("INSIRA UM E-MAIL", "E-mail é um campo obrigatório!", []);
-
-    //   emailFocusnode.requestFocus();
-    //   return;
-    // }
-
-    // final RegExp regex = RegExp(
-    //     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-    // // final RegExp regex = RegExp(r"^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$",
-    // // caseSensitive: false);
-
-    // if (!regex.hasMatch(email)) {
-    //   // return createAlert("INSIRA UM E-MAIL VÁLIDO",
-    //   //     "Este e-mail não está no formato correto!", []);
-    //   //
-    //   emailFocusnode.requestFocus();
-    //   // emailFocusnode.
-    //   return;
-    // }
-
     final String password = passwordController.text;
-    // if (password.isEmpty) {
-    //   // return createAlert(
-    //   //     "INSIRA UMA SENHA", "Senha é um campo obrigatório!", []);
-
-    //   passwordFocusnode.requestFocus();
-    //   return;
-    // }
-
-    // if (password.length < 8) {
-    //   // return createAlert("SENHA MUITO CURTA",
-    //   //     "Sua senha deve ter no mínimo 8 caracteres!", []);
-
-    //   passwordFocusnode.requestFocus();
-    // }
-
     waitingForResponse = true;
     showDialog(
         context: context,

@@ -20,8 +20,7 @@ abstract class LessonHelper {
   static Future<List<Lesson>> getLessons(String userId) async {
     Database database = await db;
     List<Map<String, dynamic>> listMap = await database
-        .rawQuery("SELECT * FROM $lessonTable l WHERE l.userId = '$userId'");
-    print("listMap: $listMap, ${listMap.runtimeType}");
+        .rawQuery("SELECT * FROM $lessonTable l WHERE l.userId = ?", [userId]);
     List<Lesson> lessons = [];
     for (Map<String, dynamic> map in listMap) {
       lessons.add(mapToLesson(map));
@@ -31,12 +30,9 @@ abstract class LessonHelper {
 
   static Future<Lesson?> getLesson(String userId, String lessonId) async {
     Database database = await db;
-    // List<Map<String, dynamic>> listMap = await database
-    //     .rawQuery("SELECT * FROM $lessonTable l WHERE l.userId = '$userId' AND l.id = '$lessonId'");
     List<Map<String, dynamic>> listMap = await database.rawQuery(
         "SELECT * FROM $lessonTable WHERE userId = ? AND id = ?",
         [userId, lessonId]);
-    print("listMap: $listMap, ${listMap.runtimeType}");
     List<Lesson> lessons = [];
     for (Map<String, dynamic> map in listMap) {
       lessons.add(mapToLesson(map));
@@ -54,10 +50,11 @@ abstract class LessonHelper {
     await database.insert(lessonTable, map);
   }
 
-  static Future<void> updateLesson(Lesson lesson, String userId) async{
+  static Future<void> updateLesson(Lesson lesson, String userId) async {
     Database database = await db;
     Map<String, dynamic> map = lesson.toMap();
-    await database.update(lessonTable, map, where: "id = ?", whereArgs: [lesson.id]);
+    await database
+        .update(lessonTable, map, where: "id = ?", whereArgs: [lesson.id]);
   }
 
   static Future<void> deleteLesson(String userId, String lessonId) async {
@@ -81,10 +78,35 @@ abstract class LessonHelper {
   }
 
   static Lesson mapToLesson(Map<String, dynamic> map) {
-    final subjectEnum = ESubject.values[map[subject]];
-    final typeEnum = ELessonType.values[map[type]];
+    late final ESubject subjectEnum;
+    late final ELessonType typeEnum;
+    for(var k in [subject, type]){
+      if(map[k].runtimeType == int){
+        (k == subject)? subjectEnum = ESubject.values[map[subject]] : typeEnum = ELessonType.values[map[type]];
+      } else if(map[k].runtimeType == String){
+        if(k == subject){
+          for(var value in ESubject.values){
+            if(value.backendDescription.toUpperCase() == map[k].toUpperCase()){
+              subjectEnum = value;
+            }
+          }
+        } else {
+          for(var value in ELessonType.values){
+            if(value.backendDescription.toUpperCase() == map[k].toUpperCase()){
+              typeEnum = value;
+            }
+          }
+        }
+      }
+    }
 
-    return Lesson(subjectEnum, map["id"], typeEnum, map[numberOfTries],
-        map[averagePrecision], map[proficiency]);
+    return Lesson(
+      subjectEnum,
+      (map["id"].runtimeType == int)? map["id"].toString().padLeft(4, "0") : map["id"],
+      typeEnum,
+      map[numberOfTries],
+      map[averagePrecision],
+      map[proficiency],
+    );
   }
 }

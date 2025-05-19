@@ -7,15 +7,13 @@ class Note {
     this.names,
     this.alternativeNames,
     this.frequencies,
-    this.audioPaths,
     this.locations,
   );
 
-  int id; // Variando de 0 (C) a 11 (B)
+  int id; // Goes from 0 (C) to 11 (B)
   List<String> names;
   List<String>? alternativeNames;
   List<int> frequencies;
-  List<String> audioPaths;
   List<NoteLocation> locations;
 
   @override

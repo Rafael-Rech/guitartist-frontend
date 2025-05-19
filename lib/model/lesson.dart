@@ -25,4 +25,7 @@ class Lesson {
     };
     return map;
   }
+
+  @override
+  String toString()=> "$id, $numberOfTries, $averagePrecision, $proficiency";
 }

@@ -26,9 +26,6 @@ class TokenHelper {
     final databasesPath = await getDatabasesPath();
     final path = join(databasesPath, "$databaseName.db");
 
-    // await deleteDatabase(path);
-    // print("Deletando database local");
-
     return await openDatabase(path, version: 1,
         onCreate: (Database db, int newVersion) async {
       await db.execute(
@@ -44,11 +41,6 @@ class TokenHelper {
     Database dbToken = await db;
     List<Map> listMap =
         await dbToken.rawQuery("SELECT * FROM $accessTokenTable");
-    print("listMap: $listMap, ${listMap.runtimeType}");
-    // if (listMap.isNotEmpty) {
-    //   return .fromMap(maps.first);
-    // }
-    // return null;
     if (listMap.isNotEmpty && listMap[0].containsKey(accessToken)) {
       return listMap[0][accessToken];
     }
@@ -61,13 +53,6 @@ class TokenHelper {
     await dbToken.insert(accessTokenTable, {accessToken: tokenString});
     return tokenString;
   }
-
-  // Future<String> updateToken(String tokenString) async {
-  //   Database dbToken = await db;
-  //   deleteToken();
-  //   await dbToken.insert(tokenTable, {accessToken: tokenString});
-  //   return tokenString;
-  // }
 
   Future<void> deleteToken() async {
     Database dbToken = await db;
