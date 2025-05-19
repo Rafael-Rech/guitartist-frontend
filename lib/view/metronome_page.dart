@@ -1,8 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-// import 'package:flutter_sound/flutter_sound.dart';
-// import 'package:tcc/global/audio_player.dart';
 import 'dart:async';
 
 import 'package:just_audio/just_audio.dart';
@@ -19,7 +17,6 @@ class _MetronomePageState extends State<MetronomePage> {
   TextEditingController controller = TextEditingController(text: "40");
   bool playing = false;
   Icon buttonIcon = const Icon(Icons.play_arrow);
-  // FlutterSoundPlayer flutterSoundPlayer = AudioPlayer.player;
   Random rng = Random();
   Timer? metronomeTimer;
   FocusNode focusNode = FocusNode();
@@ -42,10 +39,6 @@ class _MetronomePageState extends State<MetronomePage> {
 
   @override
   void dispose() {
-    // if (flutterSoundPlayer.isOpen()) {
-    //   flutterSoundPlayer.closePlayer();
-    // }
-
     justAudioPlayer.stop();
 
     if (metronomeTimer != null && metronomeTimer!.isActive) {
@@ -142,40 +135,12 @@ class _MetronomePageState extends State<MetronomePage> {
                         : const Icon(Icons.play_arrow));
                   });
                 }
-
-                // if (!flutterSoundPlayer.isOpen()) {
-                //   var aux = await FlutterSoundPlayer().openPlayer();
-                //   aux == null
-                //       ? throw Exception("Couldn't open player.")
-                //       : flutterSoundPlayer = aux;
-                //   // flutterSoundPlayer = await flutterSoundPlayer.openPlayer();
-                // }
-
-                // flutterSoundPlayer.startPlayer(
-                //     fromURI: "assets/audio/beep.wav");
-
                 if (playing && bpm != 0 && bpm <= 220 && bpm >= 40) {
                   metronomeTimer = Timer.periodic(
                     Duration(
                       milliseconds: ((60000 ~/ bpm)),
                     ),
                     (timer) {
-                      // try {
-                      //   print("Entrou no try");
-                      //   print(await flutterSoundPlayer.startPlayer(fromURI: "assets/audio/beep.wav"));
-                      //   print("Saiu do try");
-                      //   PlatformException
-                      // } catch (e) {
-                      //   print("");
-                      //   print("Início da exceção aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                      //   print(e.toString());
-                      //   print("Fim da exceção aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                      //   print("");
-                      // }
-
-                      // justAudioPlayer.setUrl(
-                      //     "https://github.com/rafaelreis-hotmart/Audio-Sample-files/blob/master/sample.mp3");
-
                       justAudioPlayer.setAsset("assets/audio/beep.wav");
 
                       justAudioPlayer.play();
@@ -212,7 +177,6 @@ class _MetronomePageState extends State<MetronomePage> {
         milliseconds: ((60000 ~/ int.parse(controller.text))),
       ),
       (timer) {
-        // flutterSoundPlayer.startPlayer(fromURI: "assets/audio/beep.wav");
         justAudioPlayer.setAsset("assets/audio/beep.wav");
 
         justAudioPlayer.play();

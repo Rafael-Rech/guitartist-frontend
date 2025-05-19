@@ -25,7 +25,6 @@ class User {
       "email": email,
       "id" : id,
       "appVersion": appVersion,
-      // "lessons": lessons,
       "lessons": mapLessons,
       "time": time,
       "profilePicture" : profilePicture,

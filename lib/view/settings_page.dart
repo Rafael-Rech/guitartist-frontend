@@ -48,7 +48,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-                  // Volume sliders
+                  //TODO: Volume sliders
                   const SizedBox(
                     height: 10.0,
                   ),
@@ -68,7 +68,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     height: 10.0,
                   ),
                 ] +
-                // (_representationButtons),
                 (buttonsWithSizedBoxes),
           ),
         ),

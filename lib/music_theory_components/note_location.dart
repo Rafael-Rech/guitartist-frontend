@@ -2,7 +2,7 @@
 class NoteLocation {
   NoteLocation(this.string, this.fret, this.frequency, this.audioPath, this.octave);
 
-  int string; // Variando de 0 (e) a 5 (E)
+  int string; // Goes from 0 (e) to 5 (E)
   int fret;
   int frequency;
   String audioPath;

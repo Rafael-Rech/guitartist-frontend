@@ -49,8 +49,6 @@ class _MyTextButtonState extends State<MyTextButton> {
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
               side: BorderSide(
-                // color: Colors.grey,
-                // color: Color.fromARGB(255, 217, 68, 99),
                 color: ((widget.borderColor == null)
                     ? MyColors.main5
                     : widget.borderColor!),

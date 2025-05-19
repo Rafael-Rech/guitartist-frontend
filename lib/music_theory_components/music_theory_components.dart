@@ -72,14 +72,14 @@ abstract class MusicTheoryComponents {
     ];
 
     const List<List<int>> listOfFrequencies = [
-      [32, 65, 130, 261, 523, 1046],  // C
-      [34, 69, 138, 277, 554, 1109],  // C#
-      [36, 73, 146, 293, 587, 1175],  // D
-      [38, 77, 155, 311, 622, 1245],  // D#
-      [41, 82, 164, 329, 659, 1319],  // E
-      [43, 87, 174, 349, 698, 1397],  // F
-      [46, 92, 185, 369, 739, 1480],  // F#
-      [49, 98, 196, 392, 784, 1568],  // G
+      [32, 65, 130, 261, 523, 1046], // C
+      [34, 69, 138, 277, 554, 1109], // C#
+      [36, 73, 146, 293, 587, 1175], // D
+      [38, 77, 155, 311, 622, 1245], // D#
+      [41, 82, 164, 329, 659, 1319], // E
+      [43, 87, 174, 349, 698, 1397], // F
+      [46, 92, 185, 369, 739, 1480], // F#
+      [49, 98, 196, 392, 784, 1568], // G
       [52, 104, 208, 415, 830, 1661], // G#
       [55, 110, 220, 440, 880, 1760], // A
       [58, 116, 233, 466, 932, 1865], // A#
@@ -87,10 +87,10 @@ abstract class MusicTheoryComponents {
     ];
 
     List<List<NoteLocation>> listOfLocations = [];
-    for (int i = 0; i < 12; i++) { // Attributes an empty list to each note
+    for (int i = 0; i < 12; i++) {
+      // Attributes an empty list to each note
       listOfLocations.add(<NoteLocation>[]);
     }
-    // print("Antes do loop principal");
     for (int string = 0; string < 6; string++) {
       // Index of the note that sounds when the string is played without pressing it
       int startingNoteIndex = -1;
@@ -125,40 +125,34 @@ abstract class MusicTheoryComponents {
       int currentFrequency = startingFrequency;
       int currentOctave = -1;
 
-      for(int octave = 0; octave < listOfFrequencies[currentNoteIndex].length; octave++){
-        if(listOfFrequencies[currentNoteIndex][octave] == startingFrequency){
+      for (int octave = 0;
+          octave < listOfFrequencies[currentNoteIndex].length;
+          octave++) {
+        if (listOfFrequencies[currentNoteIndex][octave] == startingFrequency) {
           currentOctave = octave;
         }
       }
 
-      // print("Achou a oitava atual");
-
-      if(currentOctave == -1){
+      if (currentOctave == -1) {
         throw Exception("Error finding octave");
       }
 
       // Calculate the locations of the notes
-      for (int fret = 0; fret < 22; fret++) {
-        // print("string = $string, fret = $fret, frequency = $currentFrequency");
+      for (int fret = 0; fret <= 22; fret++) {
         currentFrequency = listOfFrequencies[currentNoteIndex][currentOctave];
-        // String audioPath = "assets/audio/notes/$string$fret.wav";
         String fretString = fret.toString().padLeft(2, '0');
         String audioPath = "assets/audio/notes/$string$fretString.mp3";
-
-        // String audioPath = "assets/audio/notes/415.wav";
-        // String audioPath = "assets/audio/beep.wav";
-        listOfLocations[currentNoteIndex].add(NoteLocation(string, fret, currentFrequency, audioPath, currentOctave));
+        listOfLocations[currentNoteIndex].add(NoteLocation(
+            string, fret, currentFrequency, audioPath, currentOctave));
         currentNoteIndex = (currentNoteIndex + 1) % 12;
-        if(currentNoteIndex == 0){
+        if (currentNoteIndex == 0) {
           currentOctave++;
         }
       }
     }
 
     // Generate the notes
-    // print("Generating notes");
     for (int id = 0; id < 12; id++) {
-      // print("note $id");
       final note = Note(
         id,
         listOfNames[id],
@@ -166,13 +160,46 @@ abstract class MusicTheoryComponents {
         listOfFrequencies[id],
         listOfLocations[id],
       );
-      //           print(note);
       _notes.add(note);
     }
-    // print("Finished generating notes");
+  }
+
+  static void generateIntervals() {
+    final List<String> names = [
+      "Uníssono justo",
+      "Segunda menor",
+      "Segunda maior",
+      "Terça menor",
+      "Terça maior",
+      "Quarta justa",
+      "Quarta aumentada",
+      "Quinta diminuta",
+      "Quinta justa",
+      "Sexta menor",
+      "Sexta maior",
+      "Sétima menor",
+      "Sétima maior",
+      "Oitava justa",
+      "Nona menor",
+      "Nona maior",
+      "Décima menor",
+      "Décima maior",
+      "Décima primeira justa",
+      "Décima primeira aumentada",
+      "Décima segunda diminuta",
+      "Décima segunda justa",
+      "Décima terceira menor",
+      "Décima terceira maior"
+    ];
+    final List<int> distances = List.generate(names.length - 2, (i) => i);
+    distances.insert(6, 6);
+    distances.insert(19, 18);
+
+    for (int id = 0; id < names.length && id < distances.length; id++) {
+      _intervals.add(Interval(id, names[id], distances[id]));
+    }
   }
 
   static void generateChords() {}
-  static void generateIntervals() {}
   static void generateScales() {}
 }

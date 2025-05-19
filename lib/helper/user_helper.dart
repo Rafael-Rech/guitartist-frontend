@@ -13,7 +13,7 @@ abstract class UserHelper {
   static const String id = "id";
   static const String appVersion = "appVersion";
   static const String time = "time";
-  static const String lessons = "lessons"; // ?
+  static const String lessons = "lessons";
   static const String profilePicture = "profilePicture";
   static const String noteRepresentation = "noteRepresentation";
 
@@ -24,12 +24,9 @@ abstract class UserHelper {
   static Future<User?> getUser() async {
     Database database = await db;
     List<Map> listMap = await database.rawQuery("SELECT * FROM $userTable");
-    print("listMap no getUser local e seu tipo: $listMap, ${listMap.runtimeType}");
     Map map = Map.of(listMap.first);
     if (listMap.isNotEmpty && map.containsKey("id")) {
       List<Lesson> lessons = await LessonHelper.getLessons(map["id"]);
-      // map.putIfAbsent("lessons", () => lessons);
-      print("Lessons no banco local: $lessons");
       map["lessons"] = lessons;
       return mapToUser(map);
     }

@@ -301,8 +301,6 @@ class _AccountPageState extends State<AccountPage> {
         email = user!.email;
         nameController = TextEditingController(text: name);
       });
-    } else {
-      //Tela de erro?
     }
   }
 }

@@ -56,14 +56,13 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
   final int numberOfExercisesPerLesson = 5;
   // final int numberOfExercisesPerLesson = 15;
 
-  // final Duration animationDuration = Duration(seconds: 5);
   final Duration animationDuration = Duration(milliseconds: 200);
 
   @override
   Widget build(BuildContext context) {
     if (widget.locked) {
       sideIcon = Icons.lock;
-      expanded = false; // ?
+      expanded = false;
     } else {
       sideIcon = Icons.arrow_right;
     }
@@ -274,8 +273,6 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
     return Container(
       key: ValueKey("Expanded"),
       height: widget.width * 0.8,
-      // height: widget.width * 0.7,
-      // height: widget.width * 0.5,
       decoration: BoxDecoration(
           color: MyColors.secondary7,
           borderRadius: BorderRadius.only(
@@ -283,7 +280,6 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
             bottomRight: Radius.circular(10.0),
           )),
       child: Column(
-        // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "Precisão: ${widget.precision}%",
@@ -311,14 +307,12 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
               child: Container(
             height: 1.0,
             color: Color.fromARGB(255, 253, 253, 253),
-            // color: Color.fromARGB(255, 02, 02, 02),
           )),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               GestureDetector(
                 onTap: () async {
-                  // Mostrar o indicador circular
                   final List<Exercise> lesson =
                       await _generateLesson(ELessonType.quiz);
                   if (lesson.isEmpty) {
@@ -342,7 +336,6 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
                   }
                 },
                 child: Container(
-                  // color: MyColors.main3,
                   width: widget.width * 0.4,
                   height: widget.width * 0.4,
                   decoration: BoxDecoration(
@@ -352,7 +345,6 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
                     ),
                     borderRadius: BorderRadius.circular(15.0),
                   ),
-                  // child: Icon(Icons.quiz),
                 ),
               ),
               GestureDetector(
@@ -380,7 +372,6 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
                   }
                 },
                 child: Container(
-                  // color: MyColors.main3,
                   width: widget.width * 0.4,
                   height: widget.width * 0.4,
                   decoration: BoxDecoration(
@@ -390,7 +381,6 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
                     ),
                     borderRadius: BorderRadius.circular(15.0),
                   ),
-                  // child: Icon(Icons.headphones),
                 ),
               ),
             ],

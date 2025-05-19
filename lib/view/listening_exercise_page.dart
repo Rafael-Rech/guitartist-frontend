@@ -58,7 +58,6 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
     } on Exception {
       throw Exception("Erro ao identificar exercício");
     }
-    // _loadAnswers();
     startTime = DateTime.now();
   }
 
@@ -76,15 +75,6 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
     final appBar = AppBar(
       backgroundColor: const Color.fromARGB(255, 217, 68, 99),
       automaticallyImplyLeading: false,
-      // actions: [
-      //   IconButton(
-      //     icon: Icon(Icons.settings),
-      //     onPressed: () {
-      //       Navigator.push(context,
-      //           MaterialPageRoute(builder: (context) => const SettingsPage()));
-      //     },
-      //   )
-      // ],
       foregroundColor: MyColors.main1,
     );
 
@@ -96,7 +86,6 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            // height: screenWidth - AppBar().preferredSize.height,
             height: screenHeight -
                 AppBar().preferredSize.height -
                 2 * answersHeight,
@@ -114,14 +103,10 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
                       icon: Icon(Icons.music_note),
                       iconSize: 100.0,
                       onPressed: () async {
-                        // justAudioPlayer.setAsset("assets/audio/beep.wav");
-                        print("Path = '${exercise.audioPath}'");
-                        await justAudioPlayer.setAsset(exercise.audioPath);
-                        await justAudioPlayer.play();
-
-                        // await flutterSoundPlayer.openPlayer();
-                        // flutterSoundPlayer.startPlayer(
-                        //     fromURI: exercise.audioPath, codec: Codec.pcm16WAV, sampleRate: 44100, numChannels: 1);
+                        for (String path in exercise.audioPaths) {
+                          await justAudioPlayer.setAsset(path);
+                          await justAudioPlayer.play();
+                        }
                       },
                     ),
                   ),
@@ -140,7 +125,6 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
           ),
           SizedBox(
             height: answersHeight,
-            // height: screenHeight - screenWidth - AppBar().preferredSize.height,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -220,7 +204,6 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
       averagePrecision =
           ((numberOfTries * lesson.averagePrecision) + precisionInThisAttempt);
       averagePrecision = averagePrecision ~/ (numberOfTries + 1);
-      // proficiency = ((precisionInThisAttempt / timeSpent.inSeconds) + lesson.proficiency).ceil();
       proficiency = ((precisionInThisAttempt / timeSpent.inSeconds) * 10 +
               lesson.proficiency)
           .ceil();
@@ -232,16 +215,6 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
       lesson.proficiency = proficiency;
       await LessonHelper.updateLesson(lesson, userId);
     }
-
-    print("");
-    print("Lesson finished:");
-    print("Id = ${widget.id}");
-    print("Duration = ${timeSpent.inSeconds}s");
-    print("Average Precision = $averagePrecision");
-    print("Number of tries = ${lesson.numberOfTries}");
-    print("Proficiency = $proficiency");
-    print("");
-
     user = await UserHelper.getUser();
     if (user == null) {
       return;
@@ -251,9 +224,6 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
 
   void _loadAnswers() {
     _answers.clear();
-
-    // var correctAnswer = Random().nextInt(4);
-
     for (int i = 0; i < 4; i++) {
       late Color backgroundColor;
       late Color borderColor;

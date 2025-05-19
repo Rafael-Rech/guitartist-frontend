@@ -115,14 +115,6 @@ class _MenuPageState extends State<MenuPage> {
       }
       return;
     }
-    print("");
-    print("");
-    print("User obtido: $user");
-    print("");
-    print("");
-    print("UserLessons: ${user.lessons}");
-    print("");
-    print("");
     lessons = user.lessons;
     loaded = true;
     setState(() {});
@@ -143,17 +135,11 @@ class _MenuPageState extends State<MenuPage> {
 
     String lastId = "";
 
-    // print("");
-    // print("");
-    // print("Lessons : $lessons");
-    // print("");
-    // print("");
-
     for (int i = 0; i < lessonData.length; i++) {
       final data = lessonData[i];
       Lesson? lastLessonProgress;
       Lesson? currentLessonProgress;
-      for (Lesson progress in lessons!) {
+      for (Lesson progress in lessons) {
         if (progress.id == lastId) {
           lastLessonProgress = progress;
         } else if (progress.id == data.id) {
@@ -165,11 +151,6 @@ class _MenuPageState extends State<MenuPage> {
         height: 20.0,
       ));
 
-      // print("");
-      // print("");
-      // print("i = $i, id = ${data.id}, Current lesson progress: $currentLessonProgress");
-      // print("");
-      // print("");
 
       buttons.add(LessonMenuButton(
         lessonName: data.name,

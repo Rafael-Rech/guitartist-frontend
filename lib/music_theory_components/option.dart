@@ -1,7 +1,7 @@
 class Option {
   Option(this._isCorrect, this._text);
-  bool _isCorrect;
-  String _text;
+  final bool _isCorrect;
+  final String _text;
 
   String get text => _text;
   bool get isCorrect => _isCorrect;

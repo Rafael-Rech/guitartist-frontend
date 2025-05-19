@@ -21,11 +21,6 @@ abstract class LessonHelper {
     Database database = await db;
     List<Map<String, dynamic>> listMap = await database
         .rawQuery("SELECT * FROM $lessonTable l WHERE l.userId = ?", [userId]);
-    print("listMap no getLessons: $listMap, ${listMap.runtimeType}");
-
-      List<Map<String, dynamic>> generalListMap = await database
-        .rawQuery("SELECT * FROM $lessonTable");
-    print("listMap Geral no getLessons: $listMap");
     List<Lesson> lessons = [];
     for (Map<String, dynamic> map in listMap) {
       lessons.add(mapToLesson(map));
@@ -35,12 +30,9 @@ abstract class LessonHelper {
 
   static Future<Lesson?> getLesson(String userId, String lessonId) async {
     Database database = await db;
-    // List<Map<String, dynamic>> listMap = await database
-    //     .rawQuery("SELECT * FROM $lessonTable l WHERE l.userId = '$userId' AND l.id = '$lessonId'");
     List<Map<String, dynamic>> listMap = await database.rawQuery(
         "SELECT * FROM $lessonTable WHERE userId = ? AND id = ?",
         [userId, lessonId]);
-    print("listMap: $listMap, ${listMap.runtimeType}");
     List<Lesson> lessons = [];
     for (Map<String, dynamic> map in listMap) {
       lessons.add(mapToLesson(map));
@@ -89,30 +81,22 @@ abstract class LessonHelper {
     late final ESubject subjectEnum;
     late final ELessonType typeEnum;
     for(var k in [subject, type]){
-      // print("Key = $k, value = ${map[k]}, type = ${map[k].runtimeType}");
       if(map[k].runtimeType == int){
         (k == subject)? subjectEnum = ESubject.values[map[subject]] : typeEnum = ELessonType.values[map[type]];
       } else if(map[k].runtimeType == String){
-        // print("É uma string, uppercase = '${map[k].toUpperCase()}'");
         if(k == subject){
           for(var value in ESubject.values){
-            // print("value.backendDescription.toUpperCase() = '${value.backendDescription.toUpperCase()}'");
             if(value.backendDescription.toUpperCase() == map[k].toUpperCase()){
-              // print("match com ${value.backendDescription}");
               subjectEnum = value;
             }
           }
         } else {
           for(var value in ELessonType.values){
-            // print("value.backendDescription.toUpperCase() = '${value.backendDescription.toUpperCase()}'");
             if(value.backendDescription.toUpperCase() == map[k].toUpperCase()){
-              // print("match com ${value.backendDescription}");
               typeEnum = value;
             }
           }
         }
-      } else {
-        print("Neither type");
       }
     }
 

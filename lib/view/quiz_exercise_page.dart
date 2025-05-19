@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:tcc/global/my_colors.dart';
@@ -8,13 +7,11 @@ import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/Enum/e_lesson_type.dart';
 import 'package:tcc/model/lesson.dart';
 import 'package:tcc/model/user.dart';
-import 'package:tcc/music_theory_components/exercise.dart';
 import 'package:tcc/music_theory_components/quiz_exercise.dart';
 import 'package:tcc/service/user_service.dart';
 import 'package:tcc/view/components/my_text_button.dart';
 import 'package:tcc/view/exercise_page.dart';
 import 'package:tcc/view/home_page.dart';
-import 'package:tcc/view/settings_page.dart';
 
 class QuizExercisePage extends ExercisePage {
   const QuizExercisePage(super.id, super.exercises, super.index,
@@ -51,7 +48,6 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
     } on Exception {
       throw Exception("Erro ao identificar exercício");
     }
-    // _loadAnswers();
     startTime = DateTime.now();
   }
 
@@ -63,15 +59,6 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
     final appBar = AppBar(
       backgroundColor: const Color.fromARGB(255, 217, 68, 99),
       automaticallyImplyLeading: false,
-      // actions: [
-      //   IconButton(
-      //     icon: Icon(Icons.settings),
-      //     onPressed: () {
-      //       Navigator.push(context,
-      //           MaterialPageRoute(builder: (context) => const SettingsPage()));
-      //     },
-      //   )
-      // ],
       foregroundColor: MyColors.main1,
     );
 
@@ -83,7 +70,6 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            // height: screenWidth - AppBar().preferredSize.height,
             height: screenHeight -
                 AppBar().preferredSize.height -
                 2 * answersHeight,
@@ -100,7 +86,6 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
           ),
           SizedBox(
             height: answersHeight,
-            // height: screenHeight - screenWidth - AppBar().preferredSize.height,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -176,7 +161,6 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
       averagePrecision =
           ((numberOfTries * lesson.averagePrecision) + precisionInThisAttempt);
       averagePrecision = averagePrecision ~/ (numberOfTries + 1);
-      // proficiency = ((precisionInThisAttempt / timeSpent.inSeconds) + lesson.proficiency).ceil();
       proficiency = ((precisionInThisAttempt / timeSpent.inSeconds) * 10 +
               lesson.proficiency)
           .ceil();
@@ -189,15 +173,6 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
       await LessonHelper.updateLesson(lesson, userId);
     }
 
-    print("");
-    print("Lesson finished:");
-    print("Id = ${widget.id}");
-    print("Duration = ${timeSpent.inSeconds}s");
-    print("Average Precision = $averagePrecision");
-    print("Number of tries = ${lesson.numberOfTries}");
-    print("Proficiency = $proficiency");
-    print("");
-
     user = await UserHelper.getUser();
     if (user == null) {
       return;
@@ -207,9 +182,6 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
 
   void _loadAnswers() {
     _answers.clear();
-
-    // var correctAnswer = Random().nextInt(4);
-
     for (int i = 0; i < 4; i++) {
       late Color backgroundColor;
       late Color borderColor;
