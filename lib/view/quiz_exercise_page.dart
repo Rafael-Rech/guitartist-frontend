@@ -129,57 +129,6 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
     );
   }
 
-  Future<void> _updateProgress(
-      int precisionInThisAttempt, Duration timeSpent) async {
-    User? user = await UserHelper.getUser();
-    if (user == null) {
-      return;
-    }
-    String? userId = user.id;
-    if (userId == null) {
-      return;
-    }
-    Lesson? lesson = await LessonHelper.getLesson(userId, widget.id);
-
-    int averagePrecision, proficiency;
-    if (lesson == null) {
-      // It's the first time the user completes this lesson
-      averagePrecision = precisionInThisAttempt;
-      proficiency = averagePrecision ~/ timeSpent.inSeconds;
-      lesson = Lesson(
-        widget.subject,
-        widget.id,
-        ELessonType.quiz,
-        1,
-        averagePrecision,
-        proficiency,
-      );
-      await LessonHelper.saveLesson(lesson, userId);
-    } else {
-      // The user has already completed the lesson
-      int numberOfTries = lesson.numberOfTries;
-      averagePrecision =
-          ((numberOfTries * lesson.averagePrecision) + precisionInThisAttempt);
-      averagePrecision = averagePrecision ~/ (numberOfTries + 1);
-      proficiency = ((precisionInThisAttempt / timeSpent.inSeconds) * 10 +
-              lesson.proficiency)
-          .ceil();
-      if (proficiency > 100) {
-        proficiency = 100;
-      }
-      lesson.numberOfTries++;
-      lesson.averagePrecision = averagePrecision;
-      lesson.proficiency = proficiency;
-      await LessonHelper.updateLesson(lesson, userId);
-    }
-
-    user = await UserHelper.getUser();
-    if (user == null) {
-      return;
-    }
-    await update(user);
-  }
-
   void _loadAnswers() {
     _answers.clear();
     for (int i = 0; i < 4; i++) {
@@ -251,7 +200,7 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
                       actions: [
                         TextButton(
                           onPressed: () {
-                            _updateProgress(precision, totalTimeSpent);
+                            widget.updateProgress(precision, totalTimeSpent, ELessonType.quiz);
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
                                     builder: (context) => HomePage()),

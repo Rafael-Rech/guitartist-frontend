@@ -41,7 +41,7 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
   bool blocked = false;
   late final DateTime startTime;
   final justAudioPlayer = AudioPlayer();
-  final flutterSoundPlayer = FlutterSoundPlayer();
+  // final flutterSoundPlayer = FlutterSoundPlayer();
 
   final List<Widget> _answers = [
     Container(),
@@ -100,12 +100,21 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
                         color: MyColors.main4,
                         borderRadius: BorderRadius.circular(360)),
                     child: IconButton(
-                      icon: Icon(Icons.music_note),
+                      icon: Icon(
+                        Icons.music_note,
+                        color: MyColors.neutral2,
+                      ),
                       iconSize: 100.0,
                       onPressed: () async {
                         for (String path in exercise.audioPaths) {
-                          await justAudioPlayer.setAsset(path);
-                          await justAudioPlayer.play();
+                          // if (justAudioPlayer.duration != null) {
+                          //   Timer(justAudioPlayer.duration!, () async {
+                          //     await playAudio(path);
+                          //   });
+                          // } else {
+                          //   await playAudio(path);
+                          // }
+                          await playAudio(path);
                         }
                       },
                     ),
@@ -168,58 +177,11 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
     );
   }
 
-  Future<void> _updateProgress(int answersProvided, int correctAnswersProvided,
-      Duration timeSpent) async {
-    User? user = await UserHelper.getUser();
-    if (user == null) {
-      return;
-    }
-    String? userId = user.id;
-    if (userId == null) {
-      return;
-    }
-    Lesson? lesson = await LessonHelper.getLesson(userId, widget.id);
-
-    int averagePrecision, proficiency;
-    if (lesson == null) {
-      // It's the first time the user completes this lesson
-      averagePrecision =
-          ((correctAnswersProvided / answersProvided) * 100).ceil();
-
-      proficiency = averagePrecision ~/ timeSpent.inSeconds;
-      lesson = Lesson(
-        widget.subject,
-        widget.id,
-        ELessonType.quiz,
-        1,
-        averagePrecision,
-        proficiency,
-      );
-      await LessonHelper.saveLesson(lesson, userId);
-    } else {
-      // The user has already completed the lesson
-      int numberOfTries = lesson.numberOfTries;
-      int precisionInThisAttempt =
-          ((correctAnswersProvided / answersProvided) * 100).ceil();
-      averagePrecision =
-          ((numberOfTries * lesson.averagePrecision) + precisionInThisAttempt);
-      averagePrecision = averagePrecision ~/ (numberOfTries + 1);
-      proficiency = ((precisionInThisAttempt / timeSpent.inSeconds) * 10 +
-              lesson.proficiency)
-          .ceil();
-      if (proficiency > 100) {
-        proficiency = 100;
-      }
-      lesson.numberOfTries++;
-      lesson.averagePrecision = averagePrecision;
-      lesson.proficiency = proficiency;
-      await LessonHelper.updateLesson(lesson, userId);
-    }
-    user = await UserHelper.getUser();
-    if (user == null) {
-      return;
-    }
-    await update(user);
+  Future<void> playAudio(String path) async {
+    await justAudioPlayer.setAsset(path);
+    await justAudioPlayer.play();
+    await justAudioPlayer.processingStateStream
+        .firstWhere((state) => state == ProcessingState.completed);
   }
 
   void _loadAnswers() {
@@ -259,24 +221,77 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
                   }
                 }
                 if (widget.index == widget.exercises.length - 1) {
+                  final totalTimeSpent =
+                      widget.timeSpent + DateTime.now().difference(startTime);
+                  final precision = (((widget.correctAnswersProvided + 1) /
+                              (widget.answersProvided + numberOfAnswers)) *
+                          100)
+                      .ceil();
+                  // showDialog(
+                  //   context: context,
+                  //   builder: (context) => AlertDialog(
+                  //     title: Text("Boa :D"),
+                  //     actions: [
+                  //       TextButton(
+                  //         onPressed: () {
+                  //           _updateProgress(
+                  //               widget.answersProvided + numberOfAnswers,
+                  //               widget.correctAnswersProvided + 1,
+                  //               widget.timeSpent +
+                  //                   DateTime.now().difference(startTime));
+                  //           Navigator.of(context).pushAndRemoveUntil(
+                  //               MaterialPageRoute(
+                  //                   builder: (context) => HomePage()),
+                  //               (route) => false);
+                  //         },
+                  //         child: Text("Voltar ao início"),
+                  //       )
+                  //     ],
+                  //   ),
+                  //   barrierDismissible: false,
+                  // );
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text("Boa :D"),
+                      title: Text(
+                        "Parabéns",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      content: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 5.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Você concluiu a lição!",
+                              style: TextStyle(
+                                  fontSize: 18.0, fontWeight: FontWeight.w600),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text("Tempo: ${totalTimeSpent.inSeconds}s",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 16.0)),
+                            Text("Precisão: $precision%",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 16.0)),
+                          ],
+                        ),
+                      ),
                       actions: [
                         TextButton(
                           onPressed: () {
-                            _updateProgress(
-                                widget.answersProvided + numberOfAnswers,
-                                widget.correctAnswersProvided + 1,
-                                widget.timeSpent +
-                                    DateTime.now().difference(startTime));
+                            widget.updateProgress(precision, totalTimeSpent, ELessonType.listening);
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
                                     builder: (context) => HomePage()),
                                 (route) => false);
                           },
-                          child: Text("Voltar ao início"),
+                          child: Text(
+                            "Voltar ao início",
+                            style: TextStyle(color: MyColors.main6),
+                          ),
                         )
                       ],
                     ),

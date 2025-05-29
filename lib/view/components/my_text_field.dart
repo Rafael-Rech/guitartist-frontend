@@ -63,8 +63,6 @@ class _MyTextFieldState extends State<MyTextField> {
       decoration: InputDecoration(
         labelText: widget.labelText,
         border: widget.border,
-        // enabledBorder: ,
-        // constraints: BoxConstraints.expand(),
         focusColor: Colors.blue,
         errorText: widget.errorText,
         errorStyle: widget.errorStyle,

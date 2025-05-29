@@ -73,7 +73,7 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
           GestureDetector(
             child: AnimatedContainer(
               duration: animationDuration ~/ 2,
-              height: 60.0,
+              height: widget.width * 0.3,
               decoration: BoxDecoration(
                 borderRadius: expanded
                     ? BorderRadius.only(
@@ -106,10 +106,13 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
                           : null,
                     ),
                   ),
-                  Text(
-                    widget.lessonName,
-                    style:
-                        TextStyle(fontSize: 26.0, fontWeight: FontWeight.w600),
+                  Flexible(
+                    child: Text(
+                      widget.lessonName,
+                      style: TextStyle(
+                          fontSize: 24.0, fontWeight: FontWeight.w600),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   SizedBox(
                     width: widget.width * 0.2,
@@ -303,11 +306,11 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
                 fontWeight: FontWeight.w600),
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 15.0),
+              padding: EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 15.0),
               child: Container(
-            height: 1.0,
-            color: Color.fromARGB(255, 253, 253, 253),
-          )),
+                height: 1.0,
+                color: Color.fromARGB(255, 253, 253, 253),
+              )),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

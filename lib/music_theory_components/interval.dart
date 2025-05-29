@@ -3,11 +3,22 @@ import 'package:tcc/music_theory_components/note.dart';
 import 'package:tcc/music_theory_components/note_location.dart';
 
 class Interval {
-  Interval(this.id, this.name, this.distanceInHalfSteps);
+  Interval(this.id, this.name, this.distanceInHalfSteps, this.number);
 
   final int id;
   final String name;
   final int distanceInHalfSteps;
+  final int number;
+
+  Interval? addInterval(Interval otherInterval){
+    final int addedHalfSteps = distanceInHalfSteps + otherInterval.distanceInHalfSteps;
+    for(Interval i in MusicTheoryComponents.intervals){
+      if(i.distanceInHalfSteps == addedHalfSteps){
+        return i;
+      }
+    }
+    return null;
+  }
 
   Note calculateNote(Note baseNote) {
     List<Note> notes = MusicTheoryComponents.notes;
@@ -18,7 +29,7 @@ class Interval {
         basePosition = i;
       }
     }
-    targetPosition = basePosition + distanceInHalfSteps % 12;
+    targetPosition = (basePosition + distanceInHalfSteps) % 12;
     return notes[targetPosition];
   }
 

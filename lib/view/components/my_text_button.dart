@@ -70,10 +70,8 @@ class _MyTextButtonState extends State<MyTextButton> {
                           (widget.fontSize == null) ? 20 : widget.fontSize,
                       color: widget.textColor ?? Colors.grey,
                       fontFamily: widget.fontFamily,
-                      // color: Color.fromARGB(255, 217, 68, 99),
                     ),
                   ),
-                  // IconButton(onPressed: () {}, icon: widget.icon!),
                   widget.icon!,
                 ],
               )
@@ -83,7 +81,6 @@ class _MyTextButtonState extends State<MyTextButton> {
                 style: TextStyle(
                   fontSize: (widget.fontSize == null) ? 20 : widget.fontSize,
                   color: widget.textColor ?? Colors.grey,
-                  // color: Color.fromARGB(255, 217, 68, 99),
                 ),
               )),
       ),

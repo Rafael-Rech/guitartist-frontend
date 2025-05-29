@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:tcc/helper/lesson_helper.dart';
+import 'package:tcc/helper/user_helper.dart';
+import 'package:tcc/model/Enum/e_lesson_type.dart';
 import 'package:tcc/model/Enum/e_subject.dart';
+import 'package:tcc/model/lesson.dart';
+import 'package:tcc/model/user.dart';
 import 'package:tcc/music_theory_components/exercise.dart';
+import 'package:tcc/service/user_service.dart';
 
 class ExercisePage extends StatefulWidget {
-  const ExercisePage(this.id, this.exercises, this.index, {super.key, required this.answersProvided, required this.correctAnswersProvided, required this.timeSpent, required this.subject});
+  const ExercisePage(this.id, this.exercises, this.index,
+      {super.key,
+      required this.answersProvided,
+      required this.correctAnswersProvided,
+      required this.timeSpent,
+      required this.subject});
 
   final String id;
   final List<Exercise> exercises;
@@ -33,6 +44,57 @@ class ExercisePage extends StatefulWidget {
       },
       transitionDuration: const Duration(milliseconds: 1000),
     );
+  }
+
+  Future<void> updateProgress(int precisionInThisAttempt, Duration timeSpent,
+      ELessonType lessonType) async {
+    User? user = await UserHelper.getUser();
+    if (user == null) {
+      return;
+    }
+    String? userId = user.id;
+    if (userId == null) {
+      return;
+    }
+    Lesson? lesson = await LessonHelper.getLesson(userId, id);
+
+    int averagePrecision, proficiency;
+    if (lesson == null) {
+      // It's the first time the user completes this lesson
+      averagePrecision = precisionInThisAttempt;
+      proficiency = averagePrecision ~/ timeSpent.inSeconds;
+      lesson = Lesson(
+        subject,
+        id,
+        lessonType,
+        1,
+        averagePrecision,
+        proficiency,
+      );
+      await LessonHelper.saveLesson(lesson, userId);
+    } else {
+      // The user has already completed the lesson
+      int numberOfTries = lesson.numberOfTries;
+      averagePrecision =
+          ((numberOfTries * lesson.averagePrecision) + precisionInThisAttempt);
+      averagePrecision = averagePrecision ~/ (numberOfTries + 1);
+      proficiency = ((precisionInThisAttempt / timeSpent.inSeconds) * 10 +
+              lesson.proficiency)
+          .ceil();
+      if (proficiency > 100) {
+        proficiency = 100;
+      }
+      lesson.numberOfTries++;
+      lesson.averagePrecision = averagePrecision;
+      lesson.proficiency = proficiency;
+      await LessonHelper.updateLesson(lesson, userId);
+    }
+
+    user = await UserHelper.getUser();
+    if (user == null) {
+      return;
+    }
+    await update(user);
   }
 
   @override
