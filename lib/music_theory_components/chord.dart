@@ -4,12 +4,13 @@ import 'package:tcc/music_theory_components/note.dart';
 import 'package:tcc/music_theory_components/shape.dart';
 
 class Chord {
-  Chord(this.id, this.name, this.suffix, this.intervals);
+  Chord(this.id, this.name, this.suffix, this.intervals, this.accumulatedIntervals);
 
   final int id;
   final String name;
   final String suffix;
   final List<Interval> intervals;
+  final List<Interval> accumulatedIntervals;
 
   List<Note> calculateNotes(Note baseNote, {Shape? shape}) {
     List<Note> notes = [baseNote];
@@ -31,6 +32,13 @@ class Chord {
         notes.add(newNote);
       }
     }
+
+    final List<String> names = [];
+    for(Note n in notes){
+      names.add(n.names[0]);
+    }
+
+    // print("Notas do acorde de ${baseNote.names[0]}$suffix: $names");
 
     return notes;
   }

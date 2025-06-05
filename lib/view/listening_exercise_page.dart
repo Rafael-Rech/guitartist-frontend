@@ -38,10 +38,12 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
   double screenWidth = 0;
   double screenHeight = 0;
   final List<bool> answersTried = [false, false, false, false];
-  bool blocked = false;
+  bool blocked = false, playingAudio = false;
   late final DateTime startTime;
-  final justAudioPlayer = AudioPlayer();
+  // final justAudioPlayer = AudioPlayer();
   // final flutterSoundPlayer = FlutterSoundPlayer();
+
+  final List<AudioPlayer> players = [];
 
   final List<Widget> _answers = [
     Container(),
@@ -58,12 +60,14 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
     } on Exception {
       throw Exception("Erro ao identificar exercício");
     }
+    _initPlayers();
     startTime = DateTime.now();
   }
 
   @override
   void dispose() {
-    justAudioPlayer.stop();
+    // justAudioPlayer.stop();
+    _closePlayers();
     super.dispose();
   }
 
@@ -78,7 +82,8 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
       foregroundColor: MyColors.main1,
     );
 
-    double answersHeight = 60 + (screenWidth * 0.4);
+    double answersHeight = 60 + (screenWidth * 0.7);
+    // double answersHeight = 60 + (screenWidth * 0.4);
 
     return Scaffold(
       appBar: appBar,
@@ -88,7 +93,7 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
           SizedBox(
             height: screenHeight -
                 AppBar().preferredSize.height -
-                2 * answersHeight,
+                1.5 * answersHeight,
             child: Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
@@ -106,15 +111,8 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
                       ),
                       iconSize: 100.0,
                       onPressed: () async {
-                        for (String path in exercise.audioPaths) {
-                          // if (justAudioPlayer.duration != null) {
-                          //   Timer(justAudioPlayer.duration!, () async {
-                          //     await playAudio(path);
-                          //   });
-                          // } else {
-                          //   await playAudio(path);
-                          // }
-                          await playAudio(path);
+                        if(!playingAudio){
+                          await playAudio(exercise.playAudiosAtSameTime);
                         }
                       },
                     ),
@@ -133,7 +131,7 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
             ),
           ),
           SizedBox(
-            height: answersHeight,
+            height: answersHeight * 1.2,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -177,11 +175,52 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
     );
   }
 
-  Future<void> playAudio(String path) async {
-    await justAudioPlayer.setAsset(path);
-    await justAudioPlayer.play();
-    await justAudioPlayer.processingStateStream
-        .firstWhere((state) => state == ProcessingState.completed);
+  void _initPlayers() {
+    players.addAll(
+        List.generate(exercise.audioPaths.length, (path) => AudioPlayer()));
+  }
+
+  void _closePlayers() {
+    for (AudioPlayer player in players) {
+      player.stop();
+    }
+  }
+
+  Future<void> playAudio(bool playAudiosAtSameTime) async {
+    // if (playAudiosAtSameTime) {
+    //   // List<AudioPlayer> players = paths.map((path) => AudioPlayer()).toList();
+
+    //   // await Future.wait(players.map((player) async {
+    //   //   await player.setAsset(paths[players.indexOf(player)]);
+    //   //   await player.play();
+    //   // }));
+
+    //   final delay = Duration(milliseconds: 750);
+
+    //   for (int i = 0; i < exercise.audioPaths.length; i++) {
+    //     Future.delayed(delay * i, () async {
+    //       await players[i].setAsset(exercise.audioPaths[i]);
+    //       await players[i].play();
+    //     });
+    //   }
+    // } else {
+    //   for (int i = 0; i < exercise.audioPaths.length; i++) {
+    //     await players[i].setAsset(exercise.audioPaths[i]);
+    //     await players[i].play();
+    //     await players[i]
+    //         .processingStateStream
+    //         .firstWhere((state) => state == ProcessingState.completed);
+    //   }
+    // }
+    playingAudio = true;
+    final Duration delay = (playAudiosAtSameTime) ? Duration(milliseconds: 750) : Duration(seconds: 2);
+    for (int i = 0; i < exercise.audioPaths.length; i++) {
+      Future.delayed(delay * i, () async {
+        await players[i].setAsset(exercise.audioPaths[i]);
+        await players[i].play();
+      });
+    }
+    playingAudio = false;
   }
 
   void _loadAnswers() {
@@ -282,7 +321,8 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
                       actions: [
                         TextButton(
                           onPressed: () {
-                            widget.updateProgress(precision, totalTimeSpent, ELessonType.listening);
+                            widget.updateProgress(precision, totalTimeSpent,
+                                ELessonType.listening);
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
                                     builder: (context) => HomePage()),
@@ -325,7 +365,7 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
             borderWidth: 2.0,
             textColor: Colors.black,
             width: screenWidth * 0.4,
-            height: screenWidth * 0.2,
+            height: screenWidth * 0.4,
             fontSize: 26.0,
             text: exercise.options[i].text),
       );

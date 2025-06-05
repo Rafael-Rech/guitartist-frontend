@@ -11,6 +11,7 @@ import 'package:tcc/music_theory_components/exercise_builders/exercise_builder.d
 import 'package:tcc/music_theory_components/exercise_builders/interval_exercise_builder.dart';
 import 'package:tcc/music_theory_components/exercise_builders/note_exercise_builder.dart';
 import 'package:tcc/music_theory_components/exercise_builders/scale_exercise_builder.dart';
+import 'package:tcc/music_theory_components/music_theory_components.dart';
 import 'package:tcc/view/lesson_help_page.dart';
 import 'package:tcc/view/listening_exercise_page.dart';
 import 'package:tcc/view/login_page.dart';
@@ -60,6 +61,7 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
 
   @override
   Widget build(BuildContext context) {
+    print(MusicTheoryComponents.scales);
     if (widget.locked) {
       sideIcon = Icons.lock;
       expanded = false;
@@ -262,6 +264,7 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
 
     for (int i = 0; i < numberOfExercisesPerLesson; i++) {
       exercises.add(_generateExercise(type, noteRepresentation));
+      print("Exercício $i gerado!");
     }
 
     return exercises;

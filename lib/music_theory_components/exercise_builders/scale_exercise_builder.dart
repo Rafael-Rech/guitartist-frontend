@@ -31,24 +31,35 @@ class ScaleExerciseBuilder implements ExerciseBuilder {
         .scales[allScalesIndexes[_rng.nextInt(allScalesIndexes.length)]];
   }
 
+  Scale _getAnyScale() {
+    if (allScalesIndexes.length >= 4) {
+      return MusicTheoryComponents
+          .scales[allScalesIndexes[_rng.nextInt(allScalesIndexes.length)]];
+    }
+    return MusicTheoryComponents
+        .scales[_rng.nextInt(MusicTheoryComponents.scales.length)];
+  }
+
   @override
   List<Option> _generateOptions(Option correctOption, String property) {
     List<Option> options = [correctOption];
 
-    while(options.length < 4){
-      if(property == "scaleName"){
-        Scale newScale = _getValidScale();
+    while (options.length < 4) {
+      print("Loop do generate options");
+      if (property == "scaleName") {
+        Scale newScale = _getAnyScale();
         bool isAlreadyAnOption = false;
-        for(Option o in options){
-          if(o.text == newScale.name){
+        for (Option o in options) {
+          if (o.text == newScale.name) {
             isAlreadyAnOption = true;
           }
         }
-        if(!isAlreadyAnOption){
+        if (!isAlreadyAnOption) {
           options.add(Option(false, newScale.name));
         }
       }
     }
+    options.shuffle();
 
     return options;
   }
@@ -58,38 +69,47 @@ class ScaleExerciseBuilder implements ExerciseBuilder {
     scalesIndexes = scales;
     highlightedScalesIndexes = highlightedScales;
     for (int scaleIndex in scalesIndexes) {
+      print("Loop 1");
       allScalesIndexes.add(scaleIndex);
     }
     for (int highlightedScaleIndex in highlightedScalesIndexes) {
+      print("Loop 2");
       allScalesIndexes.add(highlightedScaleIndex);
       allScalesIndexes.add(highlightedScaleIndex);
     }
 
+    print("Passou dos dois primeiros loops");
     String? question;
     Scale scale = _getValidScale();
     switch (_type) {
       case ELessonType.listening:
+        print("Escuta");
         Note baseNote = MusicTheoryComponents.note;
-        question = "Qual escala de ${baseNote.names[_nameOption]} está sendo tocada?";
-        List<Option> options = _generateOptions(Option(true, scale.name), "scaleName");
-        
+        question =
+            "Qual escala de ${baseNote.names[_nameOption]} está sendo tocada?";
+        List<Option> options =
+            _generateOptions(Option(true, scale.name), "scaleName");
+        print("Gerou opções");
         List<String> audios = [];
         int fret = 50, string = -1, index = -1;
-        for(int i = 0; i < baseNote.locations.length; i++){
+        for (int i = 0; i < baseNote.locations.length; i++) {
+          print("Loop 3");
           NoteLocation location = baseNote.locations[i];
-          if(location.string > string && location.fret < fret){
+          if (location.string > string && location.fret < fret) {
             string = location.string;
             fret = location.fret;
             index = i;
           }
         }
         NoteLocation baseNoteLocation = baseNote.locations[index];
-        List<NoteLocation>? locations = scale.calculateLocations(baseNoteLocation);
-        if(locations == null){
+        List<NoteLocation>? locations =
+            scale.calculateLocations(baseNoteLocation);
+        if (locations == null) {
           print("locations == null");
           throw Exception("locations is null");
         }
-        for(NoteLocation location in locations){
+        for (NoteLocation location in locations) {
+          print("Loop 4");
           audios.add(location.audioPath);
         }
         return ListenExercise(question, options, audios, false);
@@ -103,46 +123,57 @@ class ScaleExerciseBuilder implements ExerciseBuilder {
     }
   }
 
-
-
   QuizExercise _recognizeNotesExercise(Scale scale) {
     Note baseNote = MusicTheoryComponents
         .notes[_rng.nextInt(MusicTheoryComponents.notes.length)];
     List<Note> notes = scale.calculateNotes(baseNote);
-    String correctOptionText = ExerciseBuilder.generateNoteOptionText(notes, _nameOption);
+    String correctOptionText =
+        ExerciseBuilder.generateNoteOptionText(notes, _nameOption);
     List<Option> options = [Option(true, correctOptionText)];
     List<Scale> scales = [scale];
-    while(options.length < 4 && scales.length < 4){
-      Scale newScale = MusicTheoryComponents.scales[_rng.nextInt(MusicTheoryComponents.scales.length)];
-      if(!scales.contains(newScale)){
+    while (options.length < 4 && scales.length < 4) {
+      print("Loop 5");
+      Scale newScale = MusicTheoryComponents
+          .scales[_rng.nextInt(MusicTheoryComponents.scales.length)];
+      if (!scales.contains(newScale)) {
         scales.add(newScale);
-        options.add(Option(false, ExerciseBuilder.generateNoteOptionText(newScale.calculateNotes(baseNote), _nameOption)));
+        options.add(Option(
+            false,
+            ExerciseBuilder.generateNoteOptionText(
+                newScale.calculateNotes(baseNote), _nameOption)));
       }
     }
     options.shuffle();
-    String question = "Quais notas formam a ${scale.name} de ${baseNote.names[_nameOption]}?";
+    String question =
+        "Quais notas formam a ${scale.name} de ${baseNote.names[_nameOption]}?";
     return QuizExercise(question, options);
   }
 
   QuizExercise _recognizeScaleExercise(Scale scale) {
-    Note baseNote = MusicTheoryComponents.notes[_rng.nextInt(MusicTheoryComponents.notes.length)];
+    Note baseNote = MusicTheoryComponents
+        .notes[_rng.nextInt(MusicTheoryComponents.notes.length)];
     List<Note> correctNotes = scale.calculateNotes(baseNote);
     String question = "Qual escala de ";
     question += baseNote.names[_nameOption];
     question += " é formada pelas notas ";
-    question += ExerciseBuilder.generateNoteOptionText(correctNotes, _nameOption);
+    question +=
+        ExerciseBuilder.generateNoteOptionText(correctNotes, _nameOption);
     question += "?";
 
     List<Option> options = [Option(true, scale.name)];
     List<Scale> scales = [scale];
 
-    while(options.length < 4){
-      Scale newScale = MusicTheoryComponents.scales[_rng.nextInt(MusicTheoryComponents.scales.length)];
-      if(!scales.contains(newScale)){
+    while (options.length < 4) {
+      print("Loop 6");
+      Scale newScale = MusicTheoryComponents
+          .scales[_rng.nextInt(MusicTheoryComponents.scales.length)];
+      if (!scales.contains(newScale)) {
         scales.add(newScale);
         options.add(Option(false, newScale.name));
       }
     }
+
+    options.shuffle();
 
     return QuizExercise(question, options);
   }

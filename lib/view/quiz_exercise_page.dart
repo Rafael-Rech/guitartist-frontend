@@ -62,7 +62,7 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
       foregroundColor: MyColors.main1,
     );
 
-    double answersHeight = 60 + (screenWidth * 0.4);
+    double answersHeight = 60 + (screenWidth * 0.6);
 
     return Scaffold(
       appBar: appBar,
@@ -85,7 +85,7 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
             ),
           ),
           SizedBox(
-            height: answersHeight,
+            height: answersHeight * 1.3,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -239,9 +239,9 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
             borderColor: borderColor,
             borderWidth: 2.0,
             textColor: Colors.black,
-            width: screenWidth * 0.4,
-            height: screenWidth * 0.2,
-            fontSize: 26.0,
+            width: screenWidth * 0.45,
+            height: screenWidth * 0.4,
+            fontSize: 24.0,
             text: exercise.options[i].text),
       );
     }

@@ -15,19 +15,19 @@ abstract class MusicTheoryComponents {
   static final Random _rng = Random();
 
   static final Map<String, int> nameAndNumberRelation = {
-      "Uníssono" : 1, 
-      "Segunda" : 2, 
-      "Terça" : 3, 
-      "Quarta": 4, 
-      "Quinta": 5, 
-      "Sexta": 6, 
-      "Sétima": 7, 
-      "Oitava": 8, 
-      "Nona": 9, 
-      "Décima": 10, 
-      "Décima primeira": 11, 
-      "Décima segunda": 12, 
-      "Décima terceira" : 13,
+    "Uníssono": 1,
+    "Segunda": 2,
+    "Terça": 3,
+    "Quarta": 4,
+    "Quinta": 5,
+    "Sexta": 6,
+    "Sétima": 7,
+    "Oitava": 8,
+    "Nona": 9,
+    "Décima": 10,
+    "Décima primeira": 11,
+    "Décima segunda": 12,
+    "Décima terceira": 13,
   };
 
   static List<Note> get notes {
@@ -188,7 +188,6 @@ abstract class MusicTheoryComponents {
   }
 
   static void generateIntervals() {
-    //TODO: Inserir o intervalo de quinta aumentada
     final List<String> names = [
       "Uníssono justo", //0
       "Segunda menor", //1
@@ -213,16 +212,18 @@ abstract class MusicTheoryComponents {
       "Décima segunda diminuta", //20
       "Décima segunda justa", //21
       "Décima terceira menor", //22
-      "Décima terceira maior" //23
+      "Décima terceira maior", //23
+      "Quinta Aumentada", //24
     ];
 
-    final List<int> distances = List.generate(names.length - 2, (i) => i);
+    final List<int> distances = List.generate(names.length - 3, (i) => i);
     distances.insert(6, 6);
     distances.insert(19, 18);
+    distances.add(8);
 
     for (int id = 0; id < names.length && id < distances.length; id++) {
       int? intervalNumber = intervalNameToNumber(names[id]);
-      if(intervalNumber == null){
+      if (intervalNumber == null) {
         throw Exception("Number is null");
       }
       _intervals.add(Interval(id, names[id], distances[id], intervalNumber));
@@ -247,7 +248,7 @@ abstract class MusicTheoryComponents {
       "",
       "m",
       "m5-",
-      "5+"
+      "5+",
       "7M",
       "7",
       "m7M",
@@ -268,30 +269,54 @@ abstract class MusicTheoryComponents {
       [intervals[4], intervals[3], intervals[8]]
     ];
 
-    int numberOfChords = suffixes.length < names.length? suffixes.length : names.length;
-    if(listsOfIntervals.length < numberOfChords){
+    final List<List<Interval>> accumulatedIntervals = List.from(
+      <List<int>>[
+        [4, 8],
+        [3, 8],
+        [3, 7],
+        [4, 24],
+        [4, 8, 12],
+        [4, 8, 11],
+        [3, 8, 12],
+        [3, 8, 11],
+        [8],
+        [4, 8, 15],
+      ].map(
+        (list) => list.map(
+          (index) => MusicTheoryComponents.intervals[index],
+        ),
+      ),
+    );
+
+    int numberOfChords =
+        suffixes.length < names.length ? suffixes.length : names.length;
+    if (listsOfIntervals.length < numberOfChords) {
       numberOfChords = listsOfIntervals.length;
     }
 
     for (int id = 0; id < numberOfChords; id++) {
-      _chords.add(Chord(id, names[id], suffixes[id], listsOfIntervals[id]));
+      _chords.add(Chord(id, names[id], suffixes[id], listsOfIntervals[id], accumulatedIntervals[id]));
     }
   }
 
   static void generateScales() {
     List<String> names = [
-      "Escala Maior Natural",
-      "Escala Maior Harmônica",
-      "Escala Menor Natural",
-      "Escala Menor Harmônica",
-      "Escala Menor Melódica",
+      "Escala Maior Natural", //0
+      "Escala Maior Harmônica", //1
+      "Escala Menor Natural", //2
+      "Escala Menor Harmônica", //3
+      "Escala Menor Melódica", //4
+      "Escala Pentatônica Maior", //5
+      "Escala Pentatônica Menor", //6
     ];
     List<String> formationRules = [
       "WWhWWWh",
       "WWhWh(W+h)h",
       "WhWWhWW",
       "WhWWh(W+h)h",
-      "WhWWWWh"
+      "WhWWWWh",
+      "WW(W+h)W(W+h)",
+      "(W+h)WW(W+h)W",
     ];
 
     for (int id = 0; id < names.length && id < intervals.length; id++) {
@@ -299,24 +324,32 @@ abstract class MusicTheoryComponents {
     }
   }
 
-  static int? intervalNameToNumber(String name){
+  // static bool hasSpace(){
+
+  // }
+
+  static int? intervalNameToNumber(String name) {
     List<String> keys = List.from(nameAndNumberRelation.keys);
     final nameSplitted = name.split(' ');
-    for(String key in keys){
-      if(key.allMatches(' ').length == 1){ // The name has two words
-        if(nameSplitted.length > 1){
+    for (String key in keys) {
+      if (key.contains(' ')) {
+        // The name has two words
+        if (nameSplitted.length > 1) {
           final words = key.split(' ');
-          if(words.first == nameSplitted.first && words[1] == nameSplitted[1]){
+          if (words.first == nameSplitted.first &&
+              words[1] == nameSplitted[1]) {
             return nameAndNumberRelation[key];
           }
         }
-      } else if(key == "Décima"){ // Distinguishes "Décima" from "Décima primeira", "Décima segunda", ...
-        if(nameSplitted.length == 2){
-          if(nameSplitted.first == key){
+      } else if (key == "Décima") {
+        // Distinguishes "Décima" from "Décima primeira", "Décima segunda", ...
+        if (nameSplitted.length == 2) {
+          if (nameSplitted.first == key) {
             return nameAndNumberRelation[key];
           }
         }
-      } else if(key == nameSplitted[0]){ // The name has only one word
+      } else if (key == nameSplitted[0]) {
+        // The name has only one word
         return nameAndNumberRelation[key];
       }
     }

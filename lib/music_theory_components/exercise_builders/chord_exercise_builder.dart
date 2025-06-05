@@ -33,7 +33,6 @@ class ChordExerciseBuilder implements ExerciseBuilder {
         .chords[allChordIndexes[_rng.nextInt(allChordIndexes.length)]];
   }
 
-  @override
   List<Option> _generateOptions(Option correctOption, String property, {Note? firstNote}) {
     List<Option> options = [correctOption];
 
@@ -73,6 +72,8 @@ class ChordExerciseBuilder implements ExerciseBuilder {
         }
       }
     }
+
+    options.shuffle();
 
     return options;
   }
@@ -139,11 +140,11 @@ class ChordExerciseBuilder implements ExerciseBuilder {
     highlightedChordIndexes = highlightedChords;
     allChordIndexes = [];
     for (int chordIndex in chordIndexes) {
-      chordIndexes.add(chordIndex);
+      allChordIndexes.add(chordIndex);
     }
     for (int highlightedChordIndex in highlightedChordIndexes) {
-      chordIndexes.add(highlightedChordIndex);
-      chordIndexes.add(highlightedChordIndex);
+      allChordIndexes.add(highlightedChordIndex);
+      allChordIndexes.add(highlightedChordIndex);
     }
 
     Chord chord = _getValidChord();
@@ -174,7 +175,7 @@ class ChordExerciseBuilder implements ExerciseBuilder {
 
   QuizExercise _guessNotesExercise(Chord chord){
     Note note = MusicTheoryComponents.note;
-    String question = "Quais são as notas que formam o acorde ${note.names[0]}?";
+    String question = "Quais são as notas que formam o acorde ${note.names[0]}${chord.suffix}?";
     List<Note> notes = chord.calculateNotes(note);
     Option correctOption = Option(true, ExerciseBuilder.generateNoteOptionText(notes, _nameOption));
     List<Option> options = _generateOptions(correctOption, "notes", firstNote: note);
@@ -191,6 +192,7 @@ class ChordExerciseBuilder implements ExerciseBuilder {
       }
       intervalsFromRootNote.add(accumulatedInterval);
     }
+    return intervalsFromRootNote;
   }
 
   QuizExercise _guessIntervalsExercise(Chord chord){
