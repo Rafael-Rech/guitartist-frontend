@@ -38,7 +38,8 @@ class ChordExerciseBuilder implements ExerciseBuilder {
 
     while (options.length < 4) {
       Chord newChord = _getValidChord();
-      List<Interval>? accumulatedIntervals = accumulateIntervals(newChord);
+      // List<Interval>? accumulatedIntervals = accumulateIntervals(newChord);
+      List<Interval> accumulatedIntervals = newChord.accumulatedIntervals;
       String intervalsText = "";
       String newChordNotes = "";
       if(firstNote != null){
@@ -197,7 +198,8 @@ class ChordExerciseBuilder implements ExerciseBuilder {
 
   QuizExercise _guessIntervalsExercise(Chord chord){
     String question = "Quais são os intervalos, a partir da nota fundamental, que formam um Acorde ${chord.name}?";
-    List<Interval>? intervalsFromRootNote = accumulateIntervals(chord);
+    // List<Interval>? intervalsFromRootNote = accumulateIntervals(chord);
+    List<Interval> intervalsFromRootNote = chord.accumulatedIntervals;
     if(intervalsFromRootNote == null){
       return _guessNotesExercise(chord);
     }

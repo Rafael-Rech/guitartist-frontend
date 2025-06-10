@@ -282,9 +282,9 @@ abstract class MusicTheoryComponents {
         [8],
         [4, 8, 15],
       ].map(
-        (list) => list.map(
+        (list) => List<Interval>.from(list.map(
           (index) => MusicTheoryComponents.intervals[index],
-        ),
+        )),
       ),
     );
 
@@ -295,7 +295,8 @@ abstract class MusicTheoryComponents {
     }
 
     for (int id = 0; id < numberOfChords; id++) {
-      _chords.add(Chord(id, names[id], suffixes[id], listsOfIntervals[id], accumulatedIntervals[id]));
+      _chords.add(Chord(id, names[id], suffixes[id], listsOfIntervals[id],
+          accumulatedIntervals[id]));
     }
   }
 

@@ -61,7 +61,6 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
 
   @override
   Widget build(BuildContext context) {
-    print(MusicTheoryComponents.scales);
     if (widget.locked) {
       sideIcon = Icons.lock;
       expanded = false;
@@ -264,7 +263,6 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
 
     for (int i = 0; i < numberOfExercisesPerLesson; i++) {
       exercises.add(_generateExercise(type, noteRepresentation));
-      print("Exercício $i gerado!");
     }
 
     return exercises;
