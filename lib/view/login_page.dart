@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/service/user_service.dart';
-import 'package:tcc/view/components/my_text_button.dart';
+import 'package:tcc/view/components/my_horizontal_button.dart';
 import 'package:tcc/view/components/my_text_form_field.dart';
 import 'package:tcc/view/home_page.dart';
 
@@ -32,8 +32,6 @@ class _LoginPageState extends State<LoginPage> {
 
   late List<Widget> textFields;
 
-  String mainButtonText = "";
-
   late Widget bottomSheet;
 
   late void Function()? mainButtonFunction;
@@ -42,195 +40,251 @@ class _LoginPageState extends State<LoginPage> {
 
   bool passwordVisible = false;
 
+  late double screenHeight;
+  late double screenWidth;
+
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-
-    title = Text(
-      (widget.isRegistering) ? "REGISTRO" : "LOGIN",
-      style: TextStyle(
-        color: MyColors.neutral2,
-        fontSize: 26,
-      ),
-    );
-
-    usernameTextField = MyTextFormField(
-      labelText: "Nome de Usuário",
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-          borderSide: BorderSide(color: MyColors.secondary5, width: 2.0)),
-      fillColor: MyColors.secondary2,
-      controller: usernameController,
-      focusNode: usernameFocusnode,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return "Nome é um campo obrigatório!";
-        }
-        return null;
-      },
-      sidePadding: 10.0,
-      formatters: [LengthLimitingTextInputFormatter(63)],
-      fontFamily: "Roboto",
-      keyboardType: TextInputType.name,
-    );
-
-    emailTextField = MyTextFormField(
-      labelText: "E-mail",
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-          borderSide: BorderSide(color: MyColors.secondary5, width: 2.0)),
-      controller: emailController,
-      fillColor: MyColors.secondary2,
-      focusNode: emailFocusnode,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return "E-mail é um campo obrigatório!";
-        }
-
-        final RegExp regex = RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-
-        if (!regex.hasMatch(value)) {
-          return "Este e-mail não está no formato correto!";
-        }
-
-        return null;
-      },
-      sidePadding: 10.0,
-      formatters: [LengthLimitingTextInputFormatter(63)],
-      fontFamily: "Roboto",
-      keyboardType: TextInputType.emailAddress,
-    );
-
-    passwordTextField = MyTextFormField(
-      labelText: "Senha",
-      obscureText: !passwordVisible,
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-          borderSide: BorderSide(color: MyColors.secondary5, width: 2.0)),
-      controller: passwordController,
-      focusNode: passwordFocusnode,
-      fillColor: MyColors.secondary2,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return "Senha é um campo obrigatório!";
-        }
-
-        if (value.length < 8) {
-          return "Sua senha deve ter no mínimo 8 caracteres!";
-        }
-
-        return null;
-      },
-      sidePadding: 10.0,
-      formatters: [LengthLimitingTextInputFormatter(63)],
-      fontFamily: "Roboto",
-      keyboardType: TextInputType.visiblePassword,
-    );
-
-    bottomSheet = Container(
-      color: MyColors.neutral1,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20.0),
-              Text(
-                (widget.isRegistering)
-                    ? "Já possui uma conta?"
-                    : "Não possui uma conta?",
-                style: TextStyle(fontSize: 20.0),
-              ),
-              const SizedBox(height: 3.0),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LoginPage(!widget.isRegistering),
-                      ));
-                },
-                child: Text(
-                  widget.isRegistering ? "Entrar" : "Registre-se",
-                  style: TextStyle(color: Colors.blue, fontSize: 20.0),
-                ),
-              ),
-              const SizedBox(
-                height: 20.0,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-
-    if (widget.isRegistering) {
-      //Register
-      textFields = [usernameTextField, emailTextField, passwordTextField];
-      mainButtonText = "CRIAR CONTA";
-      mainButtonFunction = registerFunction;
-    } else {
-      //Login
-      textFields = [emailTextField, passwordTextField];
-      mainButtonText = "ENTRAR";
-      mainButtonFunction = loginFunction;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    columnChildren = [
-      Container(
-        height: 80,
-        color: MyColors.main5,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image(
-              image: const AssetImage("assets/imgs/mainIconCropped.png"),
-              fit: BoxFit.fitHeight,
-            ),
-            title,
-          ],
-        ),
-      ),
-      const SizedBox(height: 100),
-    ];
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
+
+    _createInputs();
+
+    columnChildren = [];
 
     for (Widget w in textFields) {
       columnChildren.add(w);
-      columnChildren.add(const SizedBox(height: 10));
+      // columnChildren.add(const SizedBox(height: 10));
     }
 
-    columnChildren.add(
-      MyTextButton(
+    columnChildren.addAll([
+      SizedBox(height: 0.06 * screenHeight),
+      MyHorizontalButton(
+        height: 0.08 * screenHeight,
+        mainColor: MyColors.darkPrimary,
+        secondaryColor: MyColors.brightPrimary,
         onPressed: mainButtonFunction,
-        text: mainButtonText,
-        textColor: MyColors.neutral5,
-        borderColor: MyColors.main6,
-        fontSize: 30,
-        width: MediaQuery.of(context).size.width * 0.8,
-        borderWidth: 4,
+        text: widget.isRegistering ? "Registrar" : "Login",
+        useGradient: true,
+        width: 0.79 * screenWidth,
+        fontFamily: "Archivo Narrow",
+        fontSize: 45.0,
+        textColor: MyColors.light,
       ),
-    );
+      SizedBox(height: 0.04 * screenHeight),
+    ]);
 
     return Scaffold(
-      backgroundColor: MyColors.neutral1,
       body: SingleChildScrollView(
-          child: Form(
-        key: _formKey,
-        child: Column(
-          children: columnChildren,
+        child: Container(
+          width: screenWidth,
+          height: screenHeight,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [MyColors.darkPrimary, MyColors.brightestPrimary],
+            ),
+          ),
+          child: Center(
+            child: Container(
+              width: 0.87 * screenWidth,
+              height: (widget.isRegistering ? 0.77 : 0.72) * screenHeight,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                        SizedBox(height: 0.017 * screenHeight),
+                        Container(
+                          width: 0.29 * screenWidth,
+                          height: 0.29 * screenWidth,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(360),
+                            color: MyColors.primary,
+                          ),
+                          child: Center(
+                            child: Image(
+                              image:
+                                  AssetImage("assets/imgs/IconGuitartist.png"),
+                              width: 0.13 * screenWidth,
+                            ),
+                          ),
+                          // child: Stack(
+                          //   children: [
+                          //     Positioned(
+                          //       child: Image(
+                          //         image: AssetImage("assets/imgs/IconGuitartist.png"),
+                          //         width: 0.13 * screenWidth,
+                          //       ),
+                          //     )
+                          //   ],
+                          // ),
+                        ),
+                        SizedBox(height: 0.017 * screenHeight),
+                        _formTitle(),
+                      ] +
+                      columnChildren +
+                      [_bottomText()],
+                ),
+              ),
+            ),
+          ),
         ),
-      )),
-
-      bottomSheet: bottomSheet,
+      ),
     );
+  }
+
+  void _createInputs() {
+    usernameTextField = _createFormField(
+        "Nome", false, usernameController, usernameFocusnode, (value) {
+      if (value == null || value.isEmpty) {
+        return "Nome é um campo obrigatório!";
+      }
+      return null;
+    }, TextInputType.name);
+
+    emailTextField = _createFormField(
+        "E-mail", false, emailController, emailFocusnode, (value) {
+      if (value == null || value.isEmpty) {
+        return "E-mail é um campo obrigatório!";
+      }
+
+      final RegExp regex = RegExp(
+          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+
+      if (!regex.hasMatch(value)) {
+        return "Este e-mail não está no formato correto!";
+      }
+
+      return null;
+    }, TextInputType.emailAddress);
+
+    passwordTextField = _createFormField(
+        "Senha", true, passwordController, passwordFocusnode, (value) {
+      if (value == null || value.isEmpty) {
+        return "Senha é um campo obrigatório!";
+      }
+
+      if (value.length < 8) {
+        return "Sua senha deve ter no mínimo 8 caracteres!";
+      }
+
+      return null;
+    }, TextInputType.visiblePassword);
+
+    if (widget.isRegistering) {
+      //Register
+      textFields = [
+        usernameTextField,
+        SizedBox(height: screenHeight * 0.018),
+        emailTextField,
+        SizedBox(height: screenHeight * 0.018),
+        passwordTextField,
+      ];
+      mainButtonFunction = registerFunction;
+    } else {
+      //Login
+      textFields = [
+        emailTextField,
+        SizedBox(height: screenHeight * 0.018),
+        passwordTextField,
+      ];
+      mainButtonFunction = loginFunction;
+    }
+  }
+
+  Text _formTitle() {
+    return Text(
+      widget.isRegistering ? "Registro" : "Login",
+      style: TextStyle(
+        fontFamily: "Inter",
+        fontWeight: FontWeight.normal,
+        color: Theme.of(context).brightness == Brightness.light
+            ? MyColors.dark
+            : MyColors.light,
+        fontSize: 40.0,
+      ),
+    );
+  }
+
+  MyTextFormField _createFormField(
+      String labelText,
+      bool useObscureText,
+      TextEditingController controller,
+      FocusNode focusNode,
+      String? Function(String?)? validator,
+      TextInputType keyboardType) {
+    return MyTextFormField(
+      labelText: labelText,
+      obscureText: useObscureText ? !passwordVisible : null,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(
+          color: Theme.of(context).brightness == Brightness.light
+              ? MyColors.gray4
+              : MyColors.brightPrimary,
+          width: 3.0,
+        ),
+      ),
+      controller: controller,
+      focusNode: focusNode,
+      fillColor: Theme.of(context).brightness == Brightness.light
+          ? MyColors.light
+          : MyColors.gray4,
+      validator: validator,
+      sidePadding: 17.0,
+      formatters: [LengthLimitingTextInputFormatter(63)],
+      fontFamily: "Inter",
+      keyboardType: keyboardType,
+    );
+  }
+
+  Widget _bottomText() {
+    return Center(
+        child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          (widget.isRegistering)
+              ? "Já possui uma conta?"
+              : "Não possui uma conta?",
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.normal,
+            fontFamily: "Roboto",
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginPage(!widget.isRegistering),
+                ));
+          },
+          child: Text(
+            widget.isRegistering ? "Entrar" : "Registre-se",
+            style: TextStyle(
+              color: Color(0xFF0E4C94),
+              fontSize: 20.0,
+              fontFamily: "Roboto",
+            ),
+          ),
+        ),
+      ],
+    ));
   }
 
   Future<void> createAlert(
@@ -266,7 +320,7 @@ class _LoginPageState extends State<LoginPage> {
         context: context,
         builder: (context) => Center(
                 child: CircularProgressIndicator(
-              color: MyColors.main7,
+              color: MyColors.brightPrimary,
             )),
         barrierDismissible: false);
 
@@ -315,7 +369,7 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
         context: context,
         builder: (context) =>
-            Center(child: CircularProgressIndicator(color: MyColors.main7)),
+            Center(child: CircularProgressIndicator(color: MyColors.brightPrimary)),
         barrierDismissible: false);
 
     final String registerResult = await register(username, email, password);

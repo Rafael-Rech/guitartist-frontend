@@ -45,7 +45,6 @@ class ScaleExerciseBuilder implements ExerciseBuilder {
     List<Option> options = [correctOption];
 
     while (options.length < 4) {
-      print("Loop do generate options");
       if (property == "scaleName") {
         Scale newScale = _getAnyScale();
         bool isAlreadyAnOption = false;
@@ -69,31 +68,25 @@ class ScaleExerciseBuilder implements ExerciseBuilder {
     scalesIndexes = scales;
     highlightedScalesIndexes = highlightedScales;
     for (int scaleIndex in scalesIndexes) {
-      print("Loop 1");
       allScalesIndexes.add(scaleIndex);
     }
     for (int highlightedScaleIndex in highlightedScalesIndexes) {
-      print("Loop 2");
       allScalesIndexes.add(highlightedScaleIndex);
       allScalesIndexes.add(highlightedScaleIndex);
     }
 
-    print("Passou dos dois primeiros loops");
     String? question;
     Scale scale = _getValidScale();
     switch (_type) {
       case ELessonType.listening:
-        print("Escuta");
         Note baseNote = MusicTheoryComponents.note;
         question =
             "Qual escala de ${baseNote.names[_nameOption]} está sendo tocada?";
         List<Option> options =
             _generateOptions(Option(true, scale.name), "scaleName");
-        print("Gerou opções");
         List<String> audios = [];
         int fret = 50, string = -1, index = -1;
         for (int i = 0; i < baseNote.locations.length; i++) {
-          print("Loop 3");
           NoteLocation location = baseNote.locations[i];
           if (location.string > string && location.fret < fret) {
             string = location.string;
@@ -105,11 +98,9 @@ class ScaleExerciseBuilder implements ExerciseBuilder {
         List<NoteLocation>? locations =
             scale.calculateLocations(baseNoteLocation);
         if (locations == null) {
-          print("locations == null");
           throw Exception("locations is null");
         }
         for (NoteLocation location in locations) {
-          print("Loop 4");
           audios.add(location.audioPath);
         }
         return ListenExercise(question, options, audios, false);
@@ -132,7 +123,6 @@ class ScaleExerciseBuilder implements ExerciseBuilder {
     List<Option> options = [Option(true, correctOptionText)];
     List<Scale> scales = [scale];
     while (options.length < 4 && scales.length < 4) {
-      print("Loop 5");
       Scale newScale = MusicTheoryComponents
           .scales[_rng.nextInt(MusicTheoryComponents.scales.length)];
       if (!scales.contains(newScale)) {
@@ -164,7 +154,6 @@ class ScaleExerciseBuilder implements ExerciseBuilder {
     List<Scale> scales = [scale];
 
     while (options.length < 4) {
-      print("Loop 6");
       Scale newScale = MusicTheoryComponents
           .scales[_rng.nextInt(MusicTheoryComponents.scales.length)];
       if (!scales.contains(newScale)) {

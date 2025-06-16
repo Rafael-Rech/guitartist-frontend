@@ -28,4 +28,17 @@ abstract class MyColors{
   static Color neutral5 = const Color(0xFFA1A1A1);
   static Color neutral6 = const Color(0xFF878787);
   static Color neutral7 = const Color(0xFF6E6E6E);
+
+  static Color primary = const Color(0xFF663399);
+  static Color brightPrimary = const Color(0XFF8040BF);
+  static Color brightestPrimary = const Color(0XFF9747FF);
+  static Color darkPrimary = const Color(0xFF402060);
+  static Color darkestPrimary = const Color(0xFF331A4C);
+  static Color dark = const Color(0xFF050505);
+  static Color light = const Color(0xFFF9F9F9);
+  static Color gray1 = const Color(0xFF222222);
+  static Color gray2 = const Color(0xFF333333);
+  static Color gray3 = const Color(0xFF555555);
+  static Color gray4 = const Color(0xFF999999);
+  static Color gray5 = const Color(0xFFBBBBBB);
 }

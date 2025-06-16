@@ -7,7 +7,7 @@ import 'package:tcc/service/user_service.dart';
 import 'package:tcc/view/change_password_page.dart';
 import 'package:tcc/view/components/my_text_button.dart';
 import 'package:tcc/view/components/my_text_field.dart';
-import 'package:tcc/view/initial_page.dart';
+import 'package:tcc/view/splash_screen_page.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -218,7 +218,7 @@ class _AccountPageState extends State<AccountPage> {
     if (mounted) {
       Navigator.pop(context);
       Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const InitialPage()));
+          MaterialPageRoute(builder: (context) => const SplashScreenPage()));
     }
   }
 
