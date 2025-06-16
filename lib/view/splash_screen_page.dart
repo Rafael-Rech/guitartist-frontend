@@ -186,6 +186,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
       try {
         if (await getUserFromServer()) {
           if (mounted) {
+            print("Dando push");
             Navigator.of(context).push(_createAnimatedRoute(HomePage()));
           }
           setState(() {
@@ -198,6 +199,10 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
           i = 2;
         }
       } on DatabaseException {
+        TokenHelper().deleteDb();
+        TokenHelper().initdb();
+      } on Exception {
+        print("Excecao");
         TokenHelper().deleteDb();
         TokenHelper().initdb();
       }

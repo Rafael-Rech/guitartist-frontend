@@ -35,12 +35,12 @@ class _HomePageState extends State<HomePage> {
 
   Map<ESubject, List<LessonData>> lessonData = {};
   Map<ESubject, List<Lesson>> lessons = {};
-  bool loaded = false;
+
+  Offset? movementStart;
 
   @override
   void initState() {
     super.initState();
-    _loadProgress();
   }
 
   @override
@@ -58,13 +58,48 @@ class _HomePageState extends State<HomePage> {
         child: _generateAppBar(),
       ),
       backgroundColor: theme.colorScheme.surface,
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment:
-                (loaded ? MainAxisAlignment.start : MainAxisAlignment.center),
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: _buildExerciseButtons(ESubject.values[pageIndex]),
+      body: GestureDetector(
+        onHorizontalDragStart: (details) {
+          // print(details.localPosition);
+          movementStart = details.localPosition;
+        },
+        onHorizontalDragEnd: (details) {
+          // print(details.localPosition);
+          if (movementStart != null) {
+            if (movementStart!.dx < details.localPosition.dx && pageIndex > 0) {
+              setState(() {
+                pageIndex--;
+              });
+            } else if (movementStart!.dx > details.localPosition.dx &&
+                pageIndex < 3) {
+              setState(() {
+                pageIndex++;
+              });
+            }
+            movementStart = null;
+          }
+        },
+        child: SingleChildScrollView(
+          child: Center(
+            child: FutureBuilder(
+              future: _loadProgress(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  // if (!(snapshot.connectionState == ConnectionState.done)) {
+                  print("No data");
+                  return SizedBox(
+                      child: Center(
+                          child: CircularProgressIndicator(
+                    color: MyColors.brightPrimary,
+                  )));
+                }
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: _buildExerciseButtons(ESubject.values[pageIndex]),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -78,7 +113,7 @@ class _HomePageState extends State<HomePage> {
       colors = List.from(colors.reversed);
     }
     String title = "Notas";
-    switch (pageIndex){
+    switch (pageIndex) {
       case 1:
         title = "Intervalos";
         break;
@@ -148,48 +183,72 @@ class _HomePageState extends State<HomePage> {
           pageIndex = index;
         });
       },
-      // labelTextStyle: WidgetStateProperty.fromMap({
-      //   WidgetStatesConstraint.: TextStyle(),
-      // }),
+      backgroundColor: isDarkMode ? MyColors.gray3 : MyColors.gray5,
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          // return TextStyle(fontSize: 20.0, color: MyColors.brightestPrimary);
+          return TextStyle(
+              fontSize: 20.0,
+              color: isDarkMode ? MyColors.light : MyColors.darkestPrimary);
+        }
+        return TextStyle(
+            fontSize: 20.0,
+            color: isDarkMode ? MyColors.gray5 : MyColors.gray2);
+      }),
+      height: 150.0,
       selectedIndex: pageIndex,
+      indicatorColor: Color(0x00000000),
+      labelPadding: EdgeInsets.only(top: 1.0),
       destinations: [
-        NavigationDestination(
-          selectedIcon: Image(
-            image: AssetImage("assets/imgs/icones-em-roxo/notaOutline.png"),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 5.0),
+          child: NavigationDestination(
+            selectedIcon: Image(
+              image: AssetImage("assets/imgs/icones-em-roxo/notaOutline.png"),
+            ),
+            icon: Image(
+                image: AssetImage(isDarkMode
+                    ? "assets/imgs/icones-em-cinza-claro/nota.png"
+                    : "assets/imgs/icones-em-cinza/nota.png")),
+            label: "Notas",
           ),
-          icon: Image(
-              image: AssetImage(isDarkMode
-                  ? "assets/imgs/icones-em-cinza-claro/nota.png"
-                  : "assets/imgs/icones-em-cinza/nota.png")),
-          label: "Notas",
         ),
-        NavigationDestination(
-          selectedIcon: Image(
-            image:
-                AssetImage("assets/imgs/icones-em-roxo/intervalo.png"),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 5.0),
+          child: NavigationDestination(
+            selectedIcon: Image(
+              image:
+                  AssetImage("assets/imgs/icones-em-roxo/intervaloOutline.png"),
+            ),
+            icon: Image(
+                image: AssetImage(
+                    "assets/imgs/icones-em-cinza${isDarkMode ? '-claro' : ''}/intervalo.png")),
+            label: "Intervalos",
           ),
-          icon: Image(
-              image: AssetImage(
-                  "assets/imgs/icones-em-cinza${isDarkMode ? '-claro' : ''}/intervalo.png")),
-          label: "Intervalos",
         ),
-        NavigationDestination(
-          selectedIcon: Image(
-            image: AssetImage("assets/imgs/icones-em-roxo/escala.png"),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 5.0),
+          child: NavigationDestination(
+            selectedIcon: Image(
+              image: AssetImage("assets/imgs/icones-em-roxo/escalaOutline.png"),
+            ),
+            icon: Image(
+                image: AssetImage(
+                    "assets/imgs/icones-em-cinza${isDarkMode ? '-claro' : ''}/escala.png")),
+            label: "Escalas",
           ),
-          icon: Image(
-              image: AssetImage(
-                  "assets/imgs/icones-em-cinza${isDarkMode ? '-claro' : ''}/escala.png")),
-          label: "Escalas",
         ),
-        NavigationDestination(
-          selectedIcon: Image(
-            image: AssetImage("assets/imgs/icones-em-roxo/acorde.png"),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 5.0),
+          child: NavigationDestination(
+            selectedIcon: Image(
+              image: AssetImage("assets/imgs/icones-em-roxo/acordeOutline.png"),
+            ),
+            icon: Image(
+                image: AssetImage(
+                    "assets/imgs/icones-em-cinza${isDarkMode ? '-claro' : ''}/acorde.png")),
+            label: "Acordes",
           ),
-          icon: Image(
-              image: AssetImage(
-                  "assets/imgs/icones-em-cinza${isDarkMode ? '-claro' : ''}/acorde.png")),
-          label: "Acordes",
         ),
       ],
     );
@@ -216,53 +275,43 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _loadProgress() async {
+  Future<bool> _loadProgress() async {
+    print("Loading progress");
+    await getUserFromServer();
+    User? user = await UserHelper.getUser();
+    if (user == null) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("ERRO AO CARREGAR LIÇÕES"),
+            content: Text(
+                "Ocorreu um erro ao carregar as lições. Você será redirecionado para a tela de login."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage(false)),
+                      (route) => false);
+                },
+                child: Text("Ok"),
+              )
+            ],
+          ),
+        );
+      }
+      return false;
+    }
     for (ESubject subject in ESubject.values) {
       _loadLessonData(subject);
-      await getUserFromServer();
-      User? user = await UserHelper.getUser();
-      if (user == null) {
-        if (mounted) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text("ERRO AO CARREGAR LIÇÕES"),
-              content: Text(
-                  "Ocorreu um erro ao carregar as lições. Você será redirecionado para a tela de login."),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LoginPage(false)),
-                        (route) => false);
-                  },
-                  child: Text("Ok"),
-                )
-              ],
-            ),
-          );
-        }
-        return;
-      }
       lessons[subject] = user.lessons;
-      setState(() {});
+      // setState(() {});
     }
-    loaded = true;
+    return true;
   }
 
   List<Widget> _buildExerciseButtons(ESubject subject) {
-    if (!loaded) {
-      return [
-        SizedBox(
-            child: Center(
-                child: CircularProgressIndicator(
-          color: MyColors.brightPrimary,
-        )))
-      ];
-    }
-
     List<Widget> buttons = [];
 
     String lastId = "";

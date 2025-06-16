@@ -54,6 +54,7 @@ dependencies:
   google_fonts: ^6.2.1
   auto_size_text: ^3.0.0
   percent_indicator: ^4.2.5
+  analog_clock: ^0.1.1
   # record: ^4.4.4
   # record: ^5.0.0
   # record: ^5.1.0
@@ -87,6 +88,7 @@ flutter:
     - assets/imgs/icones-em-cinza/
     - assets/imgs/icones-em-cinza-claro/
     - assets/imgs/icones-em-roxo/
+    - assets/imgs/icones-em-roxo-claro/
     - assets/audio/
     - assets/audio/notes/
     - assets/fonts/
