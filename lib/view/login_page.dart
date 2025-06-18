@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tcc/global/my_colors.dart';
@@ -42,6 +43,8 @@ class _LoginPageState extends State<LoginPage> {
 
   late double screenHeight;
   late double screenWidth;
+  late bool isDarkMode;
+  late ThemeData theme;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -54,6 +57,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
+    theme = AdaptiveTheme.of(context).theme;
+    isDarkMode = theme.brightness == Brightness.dark;
 
     _createInputs();
 
@@ -98,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
               width: 0.87 * screenWidth,
               height: (widget.isRegistering ? 0.77 : 0.72) * screenHeight,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
+                color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Form(
@@ -210,9 +215,9 @@ class _LoginPageState extends State<LoginPage> {
       style: TextStyle(
         fontFamily: "Inter",
         fontWeight: FontWeight.normal,
-        color: Theme.of(context).brightness == Brightness.light
-            ? MyColors.dark
-            : MyColors.light,
+        color: isDarkMode
+            ? MyColors.light
+            : MyColors.dark,
         fontSize: 40.0,
       ),
     );
@@ -227,21 +232,25 @@ class _LoginPageState extends State<LoginPage> {
       TextInputType keyboardType) {
     return MyTextFormField(
       labelText: labelText,
+      fill: true,
+      labelColor: isDarkMode? MyColors.light : MyColors.gray1,
       obscureText: useObscureText ? !passwordVisible : null,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
         borderSide: BorderSide(
-          color: Theme.of(context).brightness == Brightness.light
-              ? MyColors.gray4
-              : MyColors.brightPrimary,
-          width: 3.0,
+          color: isDarkMode
+              ? Color(0x00000000)
+              // : MyColors.brightestPrimary,
+              : MyColors.gray4,
+          width: isDarkMode? 0.0 : 3.0,
         ),
       ),
       controller: controller,
       focusNode: focusNode,
-      fillColor: Theme.of(context).brightness == Brightness.light
-          ? MyColors.light
-          : MyColors.gray4,
+      fillColor: isDarkMode
+          ? Color(0xFF666666)
+          // : MyColors.gray4,
+          : MyColors.light,
       validator: validator,
       sidePadding: 17.0,
       formatters: [LengthLimitingTextInputFormatter(63)],
@@ -277,7 +286,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Text(
             widget.isRegistering ? "Entrar" : "Registre-se",
             style: TextStyle(
-              color: Color(0xFF0E4C94),
+              color: isDarkMode? Color(0xFF136CD3): Color(0xFF0E4C94),
               fontSize: 20.0,
               fontFamily: "Roboto",
             ),

@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/user_helper.dart';
@@ -38,6 +39,8 @@ class _HomePageState extends State<HomePage> {
 
   Offset? movementStart;
 
+  User? _user;
+
   @override
   void initState() {
     super.initState();
@@ -48,16 +51,36 @@ class _HomePageState extends State<HomePage> {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
 
-    theme = Theme.of(context);
+    theme = AdaptiveTheme.of(context).theme;
     isDarkMode = theme.brightness == Brightness.dark;
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async{
+        
+      },
+        child: Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(0.2 * screenHeight),
         // preferredSize: Size.fromHeight(0.266 * screenHeight),
         child: _generateAppBar(),
       ),
       backgroundColor: theme.colorScheme.surface,
+      floatingActionButton: FloatingActionButton.large(
+        shape: CircleBorder(),
+        onPressed: () {
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const MetronomePage()));
+        },
+        backgroundColor: isDarkMode ? MyColors.brightPrimary : MyColors.primary,
+        elevation: 10.0,
+        child: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Image(
+              image: AssetImage(
+                  "assets/imgs/metronomeIcon${isDarkMode ? 'Claro' : 'Escuro'}.png"),
+            )),
+      ),
       body: GestureDetector(
         onHorizontalDragStart: (details) {
           // print(details.localPosition);
@@ -88,10 +111,11 @@ class _HomePageState extends State<HomePage> {
                   // if (!(snapshot.connectionState == ConnectionState.done)) {
                   print("No data");
                   return SizedBox(
+                      height: screenHeight * 0.8 - 150.0,
                       child: Center(
                           child: CircularProgressIndicator(
-                    color: MyColors.brightPrimary,
-                  )));
+                        color: MyColors.brightPrimary,
+                      )));
                 }
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -104,7 +128,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: _generateBottomNavigationBar(),
-    );
+    ));
   }
 
   AppBar _generateAppBar() {
@@ -147,6 +171,7 @@ class _HomePageState extends State<HomePage> {
       elevation: 5.0,
       flexibleSpace: Container(
         // height: screenHeight * 0.266,
+
         height: 300.0,
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -276,10 +301,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<bool> _loadProgress() async {
+    if (_user != null &&
+        lessons.keys.length == 4 &&
+        lessonData.keys.length == 4) {
+      return true;
+    }
     print("Loading progress");
     await getUserFromServer();
-    User? user = await UserHelper.getUser();
-    if (user == null) {
+    _user = await UserHelper.getUser();
+    if (_user == null) {
       if (mounted) {
         showDialog(
           context: context,
@@ -305,7 +335,7 @@ class _HomePageState extends State<HomePage> {
     }
     for (ESubject subject in ESubject.values) {
       _loadLessonData(subject);
-      lessons[subject] = user.lessons;
+      lessons[subject] = _user!.lessons;
       // setState(() {});
     }
     return true;

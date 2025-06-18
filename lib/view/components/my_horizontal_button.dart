@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 
 class MyHorizontalButton extends StatelessWidget {
@@ -47,9 +48,9 @@ class MyHorizontalButton extends StatelessWidget {
         child: Text(
           text,
           style: TextStyle(
-            color: textColor ?? (Theme.of(context).textTheme.displayMedium?.color ?? const Color.fromARGB(255, 249, 249, 249)),
-            fontSize: fontSize ?? Theme.of(context).textTheme.displayMedium?.fontSize,
-            fontFamily: fontFamily ?? Theme.of(context).textTheme.displayMedium?.fontFamily,
+            color: textColor ?? (AdaptiveTheme.of(context).theme.textTheme.displayMedium?.color ?? const Color.fromARGB(255, 249, 249, 249)),
+            fontSize: fontSize ?? AdaptiveTheme.of(context).theme.textTheme.displayMedium?.fontSize,
+            fontFamily: fontFamily ?? AdaptiveTheme.of(context).theme.textTheme.displayMedium?.fontFamily,
           ),
         ),
       ),

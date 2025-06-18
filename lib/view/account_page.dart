@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:analog_clock/analog_clock.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +53,7 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    theme = Theme.of(context);
+    theme = AdaptiveTheme.of(context).theme;
     isDarkMode = theme.brightness == Brightness.dark;
 
     screenHeight = MediaQuery.of(context).size.height;
@@ -90,7 +91,13 @@ class _AccountPageState extends State<AccountPage> {
                     future: getInfo(),
                     builder: (context, snapshot) {
                       if (!(snapshot.connectionState == ConnectionState.done)) {
-                        return Container();
+                        return SizedBox(
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: MyColors.light,
+                            ),
+                          ),
+                        );
                       }
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.center,

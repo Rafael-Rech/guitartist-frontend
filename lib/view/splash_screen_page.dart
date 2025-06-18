@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqlite_api.dart';
 import 'package:tcc/global/my_colors.dart';
@@ -34,7 +35,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
 
-    theme = Theme.of(context);
+    theme = AdaptiveTheme.of(context).theme;
     darkMode = theme.brightness == Brightness.dark;
 
     final Image appNameImage = Image(
@@ -170,7 +171,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
 
       if (context.mounted) {
         bottomSheet = Container(
-          color: Theme.of(context).colorScheme.surface,
+          color: theme.colorScheme.surface,
           width: MediaQuery.of(context).size.width,
           child: Column(
             mainAxisSize: MainAxisSize.min,

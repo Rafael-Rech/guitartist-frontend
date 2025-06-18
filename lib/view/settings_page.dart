@@ -1,11 +1,10 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:tcc/global/my_colors.dart';
-import 'package:tcc/global/theme.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/user.dart';
 import 'package:tcc/service/user_service.dart';
 import 'package:tcc/view/components/my_horizontal_button.dart';
-import 'package:tcc/view/components/my_text_button.dart';
 import 'package:tcc/view/login_page.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -34,7 +33,8 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
-    theme = Theme.of(context);
+    // theme = Theme.of(context);
+    theme = AdaptiveTheme.of(context).theme;
     isDarkMode = theme.brightness == Brightness.dark;
 
     List<Widget> buttonsWithSizedBoxes = [];
@@ -71,8 +71,8 @@ class _SettingsPageState extends State<SettingsPage> {
       body: FutureBuilder(
           future: _generateRepresentationButtons(),
           builder: (context, snapshot) {
-            if (!(snapshot.hasData)) { 
-            // if (!(snapshot.connectionState == ConnectionState.done)) { 
+            if (!(snapshot.hasData)) {
+              // if (!(snapshot.connectionState == ConnectionState.done)) {
               return Center(
                 child: CircularProgressIndicator(color: MyColors.brightPrimary),
               );
@@ -87,6 +87,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           style: TextStyle(
                             fontSize: 50.0,
                             fontFamily: "Inter",
+                            color: isDarkMode? MyColors.light : MyColors.dark
                           ),
                         ),
                         const SizedBox(
@@ -115,6 +116,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           style: TextStyle(
                             fontSize: 50.0,
                             fontFamily: "Inter",
+                            color: isDarkMode? MyColors.light : MyColors.dark,
                           ),
                         ),
                         const SizedBox(
@@ -137,13 +139,15 @@ class _SettingsPageState extends State<SettingsPage> {
     return colors;
   }
 
-  void changeTheme() {}
-
   Widget _generateThemeButton(bool sunIcon, bool active) {
     return GestureDetector(
       onTap: () {
-        if (active) {
-          changeTheme();
+        if (!active) {
+          setState(() {
+            sunIcon
+                ? AdaptiveTheme.of(context).setLight()
+                : AdaptiveTheme.of(context).setDark();
+          });
         }
       },
       child: Container(

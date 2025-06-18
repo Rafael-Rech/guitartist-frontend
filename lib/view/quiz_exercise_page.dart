@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:tcc/global/my_colors.dart';
@@ -53,69 +54,73 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
 
-    ThemeData theme = Theme.of(context);
+    ThemeData theme = AdaptiveTheme.of(context).theme;
     bool isDarkTheme = theme.brightness == Brightness.dark;
 
     _loadAnswers();
 
-    return Scaffold(
-      body: Container(
-        width: screenWidth,
-        height: screenHeight,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              MyColors.primary,
-              MyColors.darkPrimary,
-            ],
-          ),
-        ),
-        child: Center(
-          child: Container(
-            height: 0.8 * screenHeight,
-            // height: 0.766 * screenHeight,
-            width: 0.874 * screenWidth,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Theme.of(context).colorScheme.surface,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {},
+      child: Scaffold(
+        body: Container(
+          width: screenWidth,
+          height: screenHeight,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                MyColors.primary,
+                MyColors.darkPrimary,
+              ],
             ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 0.034 * screenWidth),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                      Container(
-                        height: 0.262 * screenHeight,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: isDarkTheme
-                                ? [MyColors.primary, MyColors.brightPrimary]
-                                : [MyColors.darkPrimary, MyColors.primary],
+          ),
+          child: Center(
+            child: Container(
+              height: 0.8 * screenHeight,
+              // height: 0.766 * screenHeight,
+              width: 0.874 * screenWidth,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: theme.colorScheme.surface,
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 0.034 * screenWidth),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                        Container(
+                          height: 0.262 * screenHeight,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: isDarkTheme
+                                  ? [MyColors.primary, MyColors.brightPrimary]
+                                  : [MyColors.darkPrimary, MyColors.primary],
+                            ),
                           ),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5.0),
-                          child: Center(
-                            child: AutoSizeText(
-                              exercise.question,
-                              style: TextStyle(
-                                color: MyColors.light,
-                                fontSize: 35.0,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5.0),
+                            child: Center(
+                              child: AutoSizeText(
+                                exercise.question,
+                                style: TextStyle(
+                                  color: MyColors.light,
+                                  fontSize: 35.0,
+                                ),
+                                // maxLines: 2,
+                                textAlign: TextAlign.center,
                               ),
-                              // maxLines: 2,
-                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 1),
-                    ] +
-                    _answers,
+                        SizedBox(height: 1),
+                      ] +
+                      _answers,
+                ),
               ),
             ),
           ),

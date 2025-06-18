@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -58,7 +59,7 @@ class _LessonInfoPageState extends State<LessonInfoPage> {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
 
-    isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    isDarkMode = AdaptiveTheme.of(context).theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
