@@ -15,7 +15,6 @@ import 'package:tcc/view/account_page.dart';
 import 'package:tcc/view/components/lesson_menu_button.dart';
 import 'package:tcc/view/components/main_menu_option.dart';
 import 'package:tcc/view/login_page.dart';
-import 'package:tcc/view/menu_page.dart';
 import 'package:tcc/view/metronome_page.dart';
 import 'package:tcc/view/settings_page.dart';
 import 'package:tcc/view/tuner_page.dart';
@@ -55,80 +54,81 @@ class _HomePageState extends State<HomePage> {
     isDarkMode = theme.brightness == Brightness.dark;
 
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async{
-        
-      },
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {},
         child: Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(0.2 * screenHeight),
-        // preferredSize: Size.fromHeight(0.266 * screenHeight),
-        child: _generateAppBar(),
-      ),
-      backgroundColor: theme.colorScheme.surface,
-      floatingActionButton: FloatingActionButton.large(
-        shape: CircleBorder(),
-        onPressed: () {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const MetronomePage()));
-        },
-        backgroundColor: isDarkMode ? MyColors.brightPrimary : MyColors.primary,
-        elevation: 10.0,
-        child: Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Image(
-              image: AssetImage(
-                  "assets/imgs/metronomeIcon${isDarkMode ? 'Claro' : 'Escuro'}.png"),
-            )),
-      ),
-      body: GestureDetector(
-        onHorizontalDragStart: (details) {
-          // print(details.localPosition);
-          movementStart = details.localPosition;
-        },
-        onHorizontalDragEnd: (details) {
-          // print(details.localPosition);
-          if (movementStart != null) {
-            if (movementStart!.dx < details.localPosition.dx && pageIndex > 0) {
-              setState(() {
-                pageIndex--;
-              });
-            } else if (movementStart!.dx > details.localPosition.dx &&
-                pageIndex < 3) {
-              setState(() {
-                pageIndex++;
-              });
-            }
-            movementStart = null;
-          }
-        },
-        child: SingleChildScrollView(
-          child: Center(
-            child: FutureBuilder(
-              future: _loadProgress(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  // if (!(snapshot.connectionState == ConnectionState.done)) {
-                  print("No data");
-                  return SizedBox(
-                      height: screenHeight * 0.8 - 150.0,
-                      child: Center(
-                          child: CircularProgressIndicator(
-                        color: MyColors.brightPrimary,
-                      )));
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(0.2 * screenHeight),
+            // preferredSize: Size.fromHeight(0.266 * screenHeight),
+            child: _generateAppBar(),
+          ),
+          backgroundColor: theme.colorScheme.surface,
+          floatingActionButton: FloatingActionButton.large(
+            shape: CircleBorder(),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const MetronomePage()));
+            },
+            backgroundColor:
+                isDarkMode ? MyColors.brightPrimary : MyColors.primary,
+            elevation: 10.0,
+            child: Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Image(
+                  image: AssetImage(
+                      "assets/imgs/metronomeIcon${isDarkMode ? 'Claro' : 'Escuro'}.png"),
+                )),
+          ),
+          body: GestureDetector(
+            onHorizontalDragStart: (details) {
+              // print(details.localPosition);
+              movementStart = details.localPosition;
+            },
+            onHorizontalDragEnd: (details) {
+              // print(details.localPosition);
+              if (movementStart != null) {
+                if (movementStart!.dx < details.localPosition.dx &&
+                    pageIndex > 0) {
+                  setState(() {
+                    pageIndex--;
+                  });
+                } else if (movementStart!.dx > details.localPosition.dx &&
+                    pageIndex < 3) {
+                  setState(() {
+                    pageIndex++;
+                  });
                 }
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: _buildExerciseButtons(ESubject.values[pageIndex]),
-                );
-              },
+                movementStart = null;
+              }
+            },
+            child: SingleChildScrollView(
+              child: Center(
+                child: FutureBuilder(
+                  future: _loadProgress(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      // if (!(snapshot.connectionState == ConnectionState.done)) {
+                      print("No data");
+                      return SizedBox(
+                          height: screenHeight * 0.8 - 150.0,
+                          child: Center(
+                              child: CircularProgressIndicator(
+                            color: MyColors.brightPrimary,
+                          )));
+                    }
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children:
+                          _buildExerciseButtons(ESubject.values[pageIndex]),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: _generateBottomNavigationBar(),
-    ));
+          bottomNavigationBar: _generateBottomNavigationBar(),
+        ));
   }
 
   AppBar _generateAppBar() {
@@ -307,7 +307,10 @@ class _HomePageState extends State<HomePage> {
       return true;
     }
     print("Loading progress");
-    await getUserFromServer();
+    final result = await getUserFromServer(); //TODO: tratar isso aqui
+    if (result != "OK") {
+      return false;
+    }
     _user = await UserHelper.getUser();
     if (_user == null) {
       if (mounted) {

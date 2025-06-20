@@ -1,5 +1,6 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/user.dart';
@@ -108,26 +109,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     if (mounted) {
                       Navigator.pop(context);
                     }
-                    if (result == "OK") {
+                    if (result == EResult.ok) {
                       setState(() {
                         changedPassword = true;
                       });
                     } else {
                       if (mounted) {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  title: Text("ERRO AO ALTERAR SENHA"),
-                                  content: Text(result),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text("OK"),
-                                    )
-                                  ],
-                                ));
+                        result.createAlert(context, isDarkMode);
                       }
                     }
                   } else {

@@ -1,6 +1,7 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqlite_api.dart';
+import 'package:tcc/global/alerts.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/token_helper.dart';
 import 'package:tcc/service/user_service.dart';
@@ -185,9 +186,9 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
   void checkLogin() async {
     for (int i = 0; i < 2; i++) {
       try {
-        if (await getUserFromServer()) {
+        final result = await getUserFromServer();
+        if (result == "OK") {
           if (mounted) {
-            print("Dando push");
             Navigator.of(context).push(_createAnimatedRoute(HomePage()));
           }
           setState(() {
@@ -195,6 +196,31 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
             bottomSheetContent = null;
           });
           i = 2;
+        } else if (result == "TIMEOUT") {
+          if (mounted) {
+            await alert(
+                context,
+                "Não foi possível alcançar o servidor",
+                "Verifique sua conexão ou tente novamente mais tarde.",
+                [
+                  TextButton(
+                    onPressed: () {
+                      i--;
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      "Tentar novamente",
+                      style: TextStyle(
+                        color: darkMode? MyColors.brightPrimary : MyColors.primary,
+                        fontSize: 22.0
+                      ),
+                    ),
+                  )
+                ],
+                darkMode,
+                actionsAlignment: MainAxisAlignment.center,
+                dismissible: false);
+          }
         } else {
           generateBottomSheet();
           i = 2;
@@ -203,7 +229,6 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
         TokenHelper().deleteDb();
         TokenHelper().initdb();
       } on Exception {
-        print("Excecao");
         TokenHelper().deleteDb();
         TokenHelper().initdb();
       }
