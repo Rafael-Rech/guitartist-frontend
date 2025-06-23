@@ -1,5 +1,6 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/Enum/e_subject.dart';
@@ -17,7 +18,6 @@ import 'package:tcc/view/components/main_menu_option.dart';
 import 'package:tcc/view/login_page.dart';
 import 'package:tcc/view/metronome_page.dart';
 import 'package:tcc/view/settings_page.dart';
-import 'package:tcc/view/tuner_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -66,6 +66,9 @@ class _HomePageState extends State<HomePage> {
           floatingActionButton: FloatingActionButton.large(
             shape: CircleBorder(),
             onPressed: () {
+              if (!areLessonsLoaded()) {
+                return;
+              }
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const MetronomePage()));
             },
@@ -86,6 +89,9 @@ class _HomePageState extends State<HomePage> {
             },
             onHorizontalDragEnd: (details) {
               // print(details.localPosition);
+              if (!areLessonsLoaded()) {
+                return;
+              }
               if (movementStart != null) {
                 if (movementStart!.dx < details.localPosition.dx &&
                     pageIndex > 0) {
@@ -131,6 +137,10 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
+  bool areLessonsLoaded() {
+    return (lessonData.length == 4 && lessons.length == 4);
+  }
+
   AppBar _generateAppBar() {
     List<Color> colors = [MyColors.primary, MyColors.brightestPrimary];
     if (isDarkMode) {
@@ -152,17 +162,29 @@ class _HomePageState extends State<HomePage> {
     return AppBar(
       leading: IconButton(
           onPressed: () {
+            if (!areLessonsLoaded()) {
+              return;
+            }
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const AccountPage()),
             );
           },
-          icon: Icon(Icons.person)),
+          icon: Icon(
+            Icons.person,
+            color: isDarkMode ? MyColors.light : MyColors.dark,
+          )),
       actions: [
         IconButton(
           // iconSize: 100.0,
-          icon: Icon(Icons.settings),
+          icon: Icon(
+            Icons.settings,
+            color: isDarkMode ? MyColors.light : MyColors.dark,
+          ),
           onPressed: () {
+            if (!areLessonsLoaded()) {
+              return;
+            }
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const SettingsPage()));
           },
@@ -204,6 +226,9 @@ class _HomePageState extends State<HomePage> {
   NavigationBar _generateBottomNavigationBar() {
     return NavigationBar(
       onDestinationSelected: (int index) {
+        if (!areLessonsLoaded()) {
+          return;
+        }
         setState(() {
           pageIndex = index;
         });
@@ -301,47 +326,46 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<bool> _loadProgress() async {
-    if (_user != null &&
-        lessons.keys.length == 4 &&
-        lessonData.keys.length == 4) {
-      return true;
-    }
-    print("Loading progress");
-    final result = await getUserFromServer(); //TODO: tratar isso aqui
-    if (result != "OK") {
-      return false;
-    }
-    _user = await UserHelper.getUser();
-    if (_user == null) {
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("ERRO AO CARREGAR LIÇÕES"),
-            content: Text(
-                "Ocorreu um erro ao carregar as lições. Você será redirecionado para a tela de login."),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage(false)),
-                      (route) => false);
-                },
-                child: Text("Ok"),
-              )
-            ],
-          ),
-        );
+    bool tryingToConnect = true;
+    while (tryingToConnect) {
+      if (_user != null &&
+          lessons.keys.length == 4 &&
+          lessonData.keys.length == 4) {
+        print("Retornando true (já tinha usuário e dados)");
+        return true;
       }
-      return false;
+      print("Loading progress");
+      final EResult result = await getUserFromServer(); //TODO: tratar isso aqui
+      if (result != EResult.ok) {
+        if (mounted) {
+          await result.createAlert(context, isDarkMode);
+        }
+        if (result != EResult.serverUnreachable &&
+            result != EResult.communicationError) {
+          tryingToConnect = false;
+          print("Retornando false (não deu ok)");
+          return false;
+        }
+      }
+      if (result == EResult.ok) {
+        _user = await UserHelper.getUser();
+        if (_user == null) {
+          if (mounted) {
+            await EResult.noUser.createAlert(context, isDarkMode);
+          }
+          print("Retornando false (sem user no local)");
+          return false;
+        }
+        for (ESubject subject in ESubject.values) {
+          _loadLessonData(subject);
+          lessons[subject] = _user!.lessons;
+          // setState(() {});
+        }
+        print("Retornando true");
+        return true;
+      }
     }
-    for (ESubject subject in ESubject.values) {
-      _loadLessonData(subject);
-      lessons[subject] = _user!.lessons;
-      // setState(() {});
-    }
-    return true;
+    return false;
   }
 
   List<Widget> _buildExerciseButtons(ESubject subject) {

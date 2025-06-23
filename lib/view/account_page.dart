@@ -3,6 +3,8 @@ import 'package:analog_clock/analog_clock.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:tcc/global/alerts.dart';
+import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/token_helper.dart';
 import 'package:tcc/helper/user_helper.dart';
@@ -210,28 +212,64 @@ class _AccountPageState extends State<AccountPage> {
                 ),
 
                 MyHorizontalButton(
-                  onPressed: () async => await showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Você tem certeza que deseja sair?"),
-                      actions: [
+                  // onPressed: () async => await showDialog(
+                  //   context: context,
+                  //   builder: (context) => AlertDialog(
+                  //     title: const Text("Você tem certeza que deseja sair?"),
+                  //     actions: [
+                  //       TextButton(
+                  //         onPressed: () => Navigator.pop(context),
+                  //         child: Text(
+                  //           "Cancelar",
+                  //           style: TextStyle(color: MyColors.neutral7),
+                  //         ),
+                  //       ),
+                  //       TextButton(
+                  //         onPressed: logout,
+                  //         child: Text(
+                  //           "Sim",
+                  //           style: TextStyle(color: Colors.red),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  onPressed: () async {
+                    await alert(
+                      context,
+                      "Sair?",
+                      "Você tem certeza que deseja sair? Você precisará fazer login novamente para continuar usando o app.",
+                      [
                         TextButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
                           child: Text(
                             "Cancelar",
-                            style: TextStyle(color: MyColors.neutral7),
+                            style: TextStyle(
+                              color:
+                                  isDarkMode ? MyColors.gray5 : MyColors.gray1,
+                              fontSize: 22.0,
+                            ),
                           ),
                         ),
                         TextButton(
                           onPressed: logout,
                           child: Text(
-                            "Sim",
-                            style: TextStyle(color: Colors.red),
+                            "Sair",
+                            style: TextStyle(
+                              color: isDarkMode
+                                  ? MyColors.light
+                                  : MyColors.primary,
+                              fontSize: 22.0,
+                            ),
                           ),
                         ),
                       ],
-                    ),
-                  ),
+                      isDarkMode,
+                      actionsAlignment: MainAxisAlignment.end,
+                    );
+                  },
                   text: "Sair",
                   height: 0.1 * screenHeight,
                   width: 0.9395 * screenWidth,
@@ -247,30 +285,65 @@ class _AccountPageState extends State<AccountPage> {
                 ),
 
                 MyHorizontalButton(
-                  onPressed: () async => await showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Você tem certeza?"),
-                      content: Text(
-                          "Esta opção irá deletar a sua conta e todos os dados associados a ela. Não é possível recuperá-la. Você deseja continuar?"),
-                      actions: [
+                  // onPressed: () async => await showDialog(
+                  //   context: context,
+                  //   builder: (context) => AlertDialog(
+                  //     title: const Text("Você tem certeza?"),
+                  //     content: Text(
+                  //         "Esta opção irá deletar a sua conta e todos os dados associados a ela. Não é possível recuperá-la. Você deseja continuar?"),
+                  //     actions: [
+                  //       TextButton(
+                  //         onPressed: () => Navigator.pop(context),
+                  //         child: Text(
+                  //           "Cancelar",
+                  //           style: TextStyle(color: MyColors.secondary7),
+                  //         ),
+                  //       ),
+                  //       TextButton(
+                  //         onPressed: deleteAccount,
+                  //         child: Text(
+                  //           "Sim",
+                  //           style: TextStyle(color: Colors.red),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  onPressed: () async {
+                    await alert(
+                      context,
+                      "Você tem certeza?",
+                      "Esta opção irá deletar a sua conta e todos os dados associados a ela. Não é possível recuperá-la. Você deseja mesmo continuar?",
+                      [
                         TextButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
                           child: Text(
                             "Cancelar",
-                            style: TextStyle(color: MyColors.secondary7),
+                            style: TextStyle(
+                              color:
+                                  isDarkMode ? MyColors.gray5 : MyColors.gray1,
+                              fontSize: 22.0,
+                            ),
                           ),
                         ),
                         TextButton(
                           onPressed: deleteAccount,
                           child: Text(
-                            "Sim",
-                            style: TextStyle(color: Colors.red),
+                            "Excluir",
+                            style: TextStyle(
+                              color: theme.colorScheme.error,
+                              fontSize: 22.0,
+                            ),
                           ),
                         ),
                       ],
-                    ),
-                  ),
+                      isDarkMode,
+                      actionsAlignment: MainAxisAlignment.end,
+                      dismissible: true,
+                    );
+                  },
                   text: "Excluir conta",
                   height: 0.1 * screenHeight,
                   width: 0.9395 * screenWidth,
@@ -455,6 +528,8 @@ class _AccountPageState extends State<AccountPage> {
     }
 
     return AppBar(
+      iconTheme:
+          IconThemeData(color: isDarkMode ? MyColors.light : MyColors.dark),
       elevation: 5.0,
       flexibleSpace: Container(
         // height: screenHeight * 0.266,
@@ -489,7 +564,9 @@ class _AccountPageState extends State<AccountPage> {
                             SizedBox(
                               width: 0.8 * screenWidth,
                               child: MyTextField(
+                                textColor: isDarkMode? MyColors.light : MyColors.dark,
                                 controller: nameController,
+                                border: InputBorder.none,
                                 errorText: nameErrorText,
                                 errorStyle: TextStyle(
                                   color: Colors.white,
@@ -497,6 +574,7 @@ class _AccountPageState extends State<AccountPage> {
                                 ),
                                 fontSize: 30.0,
                                 focusNode: nameFocusNode,
+
                                 onSubmitted: (value) async {
                                   await changeName(value);
                                 },
@@ -520,7 +598,10 @@ class _AccountPageState extends State<AccountPage> {
                             nameFocusNode.requestFocus();
                           },
                           // icon: Icon(Icons.edit),
-                          icon: Icon(Icons.edit_square),
+                          icon: Icon(
+                            Icons.edit_square,
+                            color: isDarkMode ? MyColors.gray5 : MyColors.dark,
+                          ),
                           iconSize: MediaQuery.of(context).size.width * 0.15,
                         )
                       ],
@@ -540,7 +621,7 @@ class _AccountPageState extends State<AccountPage> {
         context: context,
         builder: (context) => Center(
             child: Center(
-                child: CircularProgressIndicator(color: MyColors.main7))),
+                child: CircularProgressIndicator(color: MyColors.primary))),
         barrierDismissible: false);
     await UserHelper.deleteUser();
     await TokenHelper.internal().deleteToken();
@@ -555,47 +636,51 @@ class _AccountPageState extends State<AccountPage> {
     showDialog(
         context: context,
         builder: (context) =>
-            Center(child: CircularProgressIndicator(color: MyColors.main7)),
+            Center(child: CircularProgressIndicator(color: MyColors.primary)),
         barrierDismissible: false);
-    final result = await delete();
-    if (result == "DELETED") {
+    final EResult result = await delete();
+    if (result == EResult.ok) {
       await logout();
-    } else if (result == "Servidor inalcançável") {
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("NÃO FOI POSSÍVEL ALCANÇAR O SERVIDOR"),
-            content: Text(
-                "Verifique a conexão com a internet ou tente novamente mais tarde."),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text("OK"),
-              )
-            ],
-          ),
-        );
-      }
+      // } else if (result == "Servidor inalcançável") {
+      //   if (mounted) {
+      //     showDialog(
+      //       context: context,
+      //       builder: (context) => AlertDialog(
+      //         title: Text("NÃO FOI POSSÍVEL ALCANÇAR O SERVIDOR"),
+      //         content: Text(
+      //             "Verifique a conexão com a internet ou tente novamente mais tarde."),
+      //         actions: [
+      //           TextButton(
+      //             onPressed: () {
+      //               Navigator.pop(context);
+      //             },
+      //             child: Text("OK"),
+      //           )
+      //         ],
+      //       ),
+      //     );
+      //   }
+      // } else {
+      //   if (mounted) {
+      //     showDialog(
+      //       context: context,
+      //       builder: (context) => AlertDialog(
+      //         title: Text("OCORREU UM ERRO AO EXCLUIR A CONTA"),
+      //         content: Text("Tente novamente mais tarde."),
+      //         actions: [
+      //           TextButton(
+      //             onPressed: () {
+      //               Navigator.pop(context);
+      //             },
+      //             child: Text("OK"),
+      //           )
+      //         ],
+      //       ),
+      //     );
+      //   }
     } else {
       if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("OCORREU UM ERRO AO EXCLUIR A CONTA"),
-            content: Text("Tente novamente mais tarde."),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text("OK"),
-              )
-            ],
-          ),
-        );
+        await result.createAlert(context, isDarkMode);
       }
     }
   }
@@ -607,9 +692,13 @@ class _AccountPageState extends State<AccountPage> {
       });
       user!.name = name;
 
-      final result = await update(user!);
-      if (result == "OK") {
+      final EResult result = await update(user!);
+      if (result == EResult.ok) {
         await UserHelper.saveUser(user!);
+      } else {
+        if (mounted) {
+          await result.createAlert(context, isDarkMode);
+        }
       }
     } else if (name.isEmpty) {
       setState(() {
@@ -638,6 +727,10 @@ class _AccountPageState extends State<AccountPage> {
         }
         totalPrecision ~/= user!.lessons.length;
       });
+    } else {
+      if (mounted) {
+        await EResult.noUser.createAlert(context, isDarkMode);
+      }
     }
   }
 }

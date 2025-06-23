@@ -48,7 +48,7 @@ class MainMenuOption extends StatelessWidget {
       // Bigger button
         button = Container(
           decoration: BoxDecoration(
-            color: MyColors.secondary3,
+            // color: MyColors.secondary3,
             borderRadius: BorderRadius.circular(10),
           ),
           height: MediaQuery.of(context).size.height * 0.10,
@@ -104,7 +104,7 @@ class MainMenuOption extends StatelessWidget {
           width: MediaQuery.of(context).size.width * 0.4,
           height: MediaQuery.of(context).size.width * 0.4,
           decoration: BoxDecoration(
-            color: MyColors.secondary2,
+            // color: MyColors.secondary2,
             borderRadius: BorderRadius.circular(30),
           ),
           child: Stack(

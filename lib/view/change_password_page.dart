@@ -1,10 +1,12 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:tcc/global/alerts.dart';
 import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/user.dart';
 import 'package:tcc/service/user_service.dart';
+import 'package:tcc/view/account_page.dart';
 import 'package:tcc/view/components/my_horizontal_button.dart';
 import 'package:tcc/view/components/my_text_button.dart';
 import 'package:tcc/view/components/my_text_field.dart';
@@ -46,91 +48,91 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
     late Widget body;
 
-    if (changedPassword) {
-      body = Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Senha alterada com sucesso!",
-              style: TextStyle(fontSize: 28.0),
-            ),
-            const SizedBox(height: 15.0),
-            MyTextButton(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                      (Route<dynamic> route) => false);
-                },
-                text: "Voltar ao início")
-          ],
-        ),
-      );
-    } else {
-      body = Center(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              MyTextField(
-                controller: passwordController,
-                errorText: passwordErrorText,
-                labelText: "Nova Senha",
-                obscureText: true,
-                sidePadding: 15.0,
-              ),
-              SizedBox(
-                height: 15.0,
-              ),
-              MyTextButton(
-                text: "Alterar",
-                fontSize: 22.0,
-                borderWidth: 2.0,
-                borderColor: MyColors.main6,
-                textColor: MyColors.neutral7,
-                onPressed: () async {
-                  if (validate(passwordController.text)) {
-                    setState(() {
-                      passwordErrorText = null;
-                    });
-                    showDialog(
-                        context: context,
-                        builder: (context) => Center(
-                              child: CircularProgressIndicator(
-                                color: MyColors.main7,
-                              ),
-                            ),
-                        barrierDismissible: false);
-                    final result =
-                        await changePassword(passwordController.text);
-                    if (mounted) {
-                      Navigator.pop(context);
-                    }
-                    if (result == EResult.ok) {
-                      setState(() {
-                        changedPassword = true;
-                      });
-                    } else {
-                      if (mounted) {
-                        result.createAlert(context, isDarkMode);
-                      }
-                    }
-                  } else {
-                    setState(() {
-                      passwordErrorText =
-                          "A senha deve conter entre 8 e 63 caracteres!";
-                    });
-                  }
-                },
-              )
-            ],
-          ),
-        ),
-      );
-    }
+    // if (changedPassword) {
+    //   body = Center(
+    //     child: Column(
+    //       crossAxisAlignment: CrossAxisAlignment.center,
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       children: [
+    //         Text(
+    //           "Senha alterada com sucesso!",
+    //           style: TextStyle(fontSize: 28.0),
+    //         ),
+    //         const SizedBox(height: 15.0),
+    //         MyTextButton(
+    //             onPressed: () {
+    //               Navigator.pushAndRemoveUntil(
+    //                   context,
+    //                   MaterialPageRoute(builder: (context) => HomePage()),
+    //                   (Route<dynamic> route) => false);
+    //             },
+    //             text: "Voltar ao início")
+    //       ],
+    //     ),
+    //   );
+    // } else {
+    //   body = Center(
+    //     child: SingleChildScrollView(
+    //       child: Column(
+    //         crossAxisAlignment: CrossAxisAlignment.center,
+    //         mainAxisAlignment: MainAxisAlignment.center,
+    //         children: [
+    //           MyTextField(
+    //             controller: passwordController,
+    //             errorText: passwordErrorText,
+    //             labelText: "Nova Senha",
+    //             obscureText: true,
+    //             sidePadding: 15.0,
+    //           ),
+    //           SizedBox(
+    //             height: 15.0,
+    //           ),
+    //           MyTextButton(
+    //             text: "Alterar",
+    //             fontSize: 22.0,
+    //             borderWidth: 2.0,
+    //             borderColor: MyColors.main6,
+    //             textColor: MyColors.neutral7,
+    //             onPressed: () async {
+    //               if (validate(passwordController.text)) {
+    //                 setState(() {
+    //                   passwordErrorText = null;
+    //                 });
+    //                 await showDialog(
+    //                     context: context,
+    //                     builder: (context) => Center(
+    //                           child: CircularProgressIndicator(
+    //                             color: MyColors.primary,
+    //                           ),
+    //                         ),
+    //                     barrierDismissible: false);
+    //                 final result =
+    //                     await changePassword(passwordController.text);
+    //                 if (mounted) {
+    //                   Navigator.pop(context);
+    //                 }
+    //                 if (result == EResult.ok) {
+    //                   setState(() {
+    //                     changedPassword = true;
+    //                   });
+    //                 } else {
+    //                   if (mounted) {
+    //                     result.createAlert(context, isDarkMode);
+    //                   }
+    //                 }
+    //               } else {
+    //                 setState(() {
+    //                   passwordErrorText =
+    //                       "A senha deve conter entre 8 e 63 caracteres!";
+    //                 });
+    //               }
+    //             },
+    //           )
+    //         ],
+    //       ),
+    //     ),
+    //   );
+    // }
 
     return Scaffold(
       appBar: PreferredSize(
@@ -250,17 +252,28 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Future<bool> _verifyOldPassword() async {
+  Future<EResult> _verifyOldPassword() async {
     User? user = await UserHelper.getUser();
     if (user == null) {
-      return false;
+      // if (mounted) {
+      //   await EResult.noUser.createAlert(context, isDarkMode);
+      // }
+      // return false;
+      return EResult.noUser;
     }
     String email = user.email;
-    final result = await login(email, oldPasswordController.text);
-    if (result != "OK") {
-      return false;
-    }
-    return true;
+    final EResult result = await login(email, oldPasswordController.text);
+    // if (result != EResult.ok) {
+    //   if (mounted) {
+    //     await result.createAlert(
+    //       context,
+    //       isDarkMode,
+    //     );
+    //   }
+    //   return false;
+    // }
+    // return true;
+    return result;
   }
 
   Future<void> buttonFunction() async {
@@ -283,60 +296,143 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               ),
             ),
         barrierDismissible: false);
-    if (!(await _verifyOldPassword())) {
+    final EResult passwordVerification = await _verifyOldPassword();
+    if (passwordVerification == EResult.invalidEmailOrPassword) {
+      if (mounted) {
+        await passwordVerification.createAlert(
+            context,
+            title: "Senha incorreta",
+            content: "Confira sua senha atual e tente novamente.",
+            isDarkMode);
+      }
       if (mounted) {
         Navigator.pop(context);
-        showDialog(
-            context: context,
-            builder: (context) =>
-                AlertDialog(title: Text("Senha incorreta"), actions: [
-                  TextButton(
-                      child: Text("Ok"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      })
-                ]));
       }
-
+      return;
+    } else if (passwordVerification != EResult.ok) {
+      if (mounted) {
+        await passwordVerification.createAlert(context, isDarkMode);
+      }
+      if (mounted) {
+        Navigator.pop(context);
+      }
       return;
     }
 
-    final result = await changePassword(passwordController.text);
+    // if (!(await _verifyOldPassword())) {
+    //   if (mounted) {
+    //     Navigator.pop(context);
+    //     showDialog(
+    //         context: context,
+    //         builder: (context) =>
+    //             AlertDialog(title: Text("Senha incorreta"), actions: [
+    //               TextButton(
+    //                   child: Text("Ok"),
+    //                   onPressed: () {
+    //                     Navigator.pop(context);
+    //                   })
+    //             ]));
+    //   }
+
+    //   return;
+    // }
+    if (mounted) {
+      bool confirm = true;
+      await alert(
+          context,
+          "Confirmação",
+          "Você tem certeza de que deseja alterar sua senha?",
+          [
+            TextButton(
+              onPressed: () {
+                confirm = false;
+                Navigator.pop(context);
+              },
+              child: Text(
+                "Cancelar",
+                style:
+                    TextStyle(color: theme.colorScheme.error, fontSize: 22.0),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                "Alterar",
+                style: TextStyle(color: MyColors.primary, fontSize: 22.0),
+              ),
+            ),
+          ],
+          isDarkMode,
+          actionsAlignment: MainAxisAlignment.end,
+          dismissible: false);
+      if (!confirm) {
+        if(mounted){
+          Navigator.pop(context);
+        }
+        return;
+      }
+    }
+
+    final EResult result = await changePassword(passwordController.text);
     if (mounted) {
       Navigator.pop(context);
     }
-    if (result == "OK") {
+    if (result == EResult.ok) {
       // setState(() {
       //   changedPassword = true;
       // });
       if (mounted) {
-        showDialog(
-            context: context,
-            builder: (context) =>
-                AlertDialog(title: Text("Senha alterada!"), actions: [
-                  TextButton(
-                      child: Text("Ok"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      })
-                ]));
+        // showDialog(
+        // context: context,
+        // builder: (context) =>
+        //     AlertDialog(title: Text("Senha alterada!"), actions: [
+        //       TextButton(
+        //           child: Text("Ok"),
+        //           onPressed: () {
+        //             Navigator.pop(context);
+        //           })
+        //     ]));
+        await alert(
+            context,
+            "Senha alterada",
+            "Sua senha foi alterada com sucesso",
+            [
+              TextButton(
+                child: Text(
+                  "Ok",
+                  style: TextStyle(
+                    color:
+                        isDarkMode ? MyColors.brightPrimary : MyColors.primary,
+                    fontSize: 22.0,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AccountPage()));
+                },
+              )
+            ],
+            isDarkMode);
       }
     } else {
       if (mounted) {
-        showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  title: Text("ERRO AO ALTERAR SENHA"),
-                  content: Text(result),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text("OK"),
-                    )
-                  ],
-                ));
+        // showDialog(
+        //     context: context,
+        //     builder: (context) => AlertDialog(
+        //           title: Text("ERRO AO ALTERAR SENHA"),
+        //           content: Text(result),
+        //           actions: [
+        //             TextButton(
+        //               onPressed: () {
+        //                 Navigator.pop(context);
+        //               },
+        //               child: Text("OK"),
+        //             )
+        //           ],
+        //         ));
+        await result.createAlert(context, isDarkMode);
       }
     }
   }
@@ -348,6 +444,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     }
 
     return AppBar(
+      iconTheme:
+          IconThemeData(color: isDarkMode ? MyColors.light : MyColors.dark),
       elevation: 5.0,
       flexibleSpace: Container(
         // height: screenHeight * 0.266,

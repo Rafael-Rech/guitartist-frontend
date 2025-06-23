@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tcc/global/e_result.dart';
 import 'package:tcc/helper/lesson_helper.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/Enum/e_lesson_type.dart';
@@ -46,15 +47,15 @@ class ExercisePage extends StatefulWidget {
     );
   }
 
-  Future<void> updateProgress(int precisionInThisAttempt, Duration timeSpent,
+  Future<EResult?> updateProgress(int precisionInThisAttempt, Duration timeSpent,
       ELessonType lessonType) async {
     User? user = await UserHelper.getUser();
     if (user == null) {
-      return;
+      return EResult.noUser;
     }
     String? userId = user.id;
     if (userId == null) {
-      return;
+      return EResult.noUserId;
     }
     Lesson? lesson = await LessonHelper.getLesson(userId, id);
 
@@ -92,9 +93,13 @@ class ExercisePage extends StatefulWidget {
 
     user = await UserHelper.getUser();
     if (user == null) {
-      return;
+      return EResult.noUser;
     }
-    await update(user);
+    final EResult result = await update(user);
+    if (result != EResult.ok) {
+      return result;
+    }
+    return null;
   }
 
   @override

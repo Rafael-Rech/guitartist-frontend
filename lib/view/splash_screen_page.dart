@@ -2,6 +2,7 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqlite_api.dart';
 import 'package:tcc/global/alerts.dart';
+import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/token_helper.dart';
 import 'package:tcc/service/user_service.dart';
@@ -186,8 +187,8 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
   void checkLogin() async {
     for (int i = 0; i < 2; i++) {
       try {
-        final result = await getUserFromServer();
-        if (result == "OK") {
+        final EResult result = await getUserFromServer();
+        if (result == EResult.ok) {
           if (mounted) {
             Navigator.of(context).push(_createAnimatedRoute(HomePage()));
           }
@@ -196,13 +197,38 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
             bottomSheetContent = null;
           });
           i = 2;
-        } else if (result == "TIMEOUT") {
+        } else if (result == EResult.noUser ||
+            result == EResult.noUserId ||
+            result == EResult.noToken) {
+          generateBottomSheet();
+          i = 2;
+        } else {
           if (mounted) {
-            await alert(
-                context,
-                "Não foi possível alcançar o servidor",
-                "Verifique sua conexão ou tente novamente mais tarde.",
-                [
+            // await alert(
+            //     context,
+            //     "Não foi possível alcançar o servidor",
+            //     "Verifique sua conexão ou tente novamente mais tarde.",
+            //     [
+            //       TextButton(
+            //         onPressed: () {
+            //           i--;
+            //           Navigator.of(context).pop();
+            //         },
+            //         child: Text(
+            //           "Tentar novamente",
+            //           style: TextStyle(
+            //               color: darkMode
+            //                   ? MyColors.brightPrimary
+            //                   : MyColors.primary,
+            //               fontSize: 22.0),
+            //         ),
+            //       )
+            //     ],
+            //     darkMode,
+            //     actionsAlignment: MainAxisAlignment.center,
+            //     dismissible: false);
+            await result.createAlert(context, darkMode,
+                actions: [
                   TextButton(
                     onPressed: () {
                       i--;
@@ -211,19 +237,16 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
                     child: Text(
                       "Tentar novamente",
                       style: TextStyle(
-                        color: darkMode? MyColors.brightPrimary : MyColors.primary,
-                        fontSize: 22.0
-                      ),
+                          color: darkMode
+                              ? MyColors.brightPrimary
+                              : MyColors.primary,
+                          fontSize: 22.0),
                     ),
                   )
                 ],
-                darkMode,
                 actionsAlignment: MainAxisAlignment.center,
-                dismissible: false);
+                barrierDismissible: false);
           }
-        } else {
-          generateBottomSheet();
-          i = 2;
         }
       } on DatabaseException {
         TokenHelper().deleteDb();

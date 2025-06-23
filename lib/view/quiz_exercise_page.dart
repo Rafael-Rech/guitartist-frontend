@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:tcc/global/alerts.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/model/Enum/e_lesson_type.dart';
 import 'package:tcc/music_theory_components/quiz_exercise.dart';
@@ -31,6 +32,8 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
   bool blocked = false;
   late final DateTime startTime;
 
+  late bool isDarkMode;
+
   final List<Widget> _answers = [
     Container(),
     Container(),
@@ -55,7 +58,7 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
     screenHeight = MediaQuery.of(context).size.height;
 
     ThemeData theme = AdaptiveTheme.of(context).theme;
-    bool isDarkTheme = theme.brightness == Brightness.dark;
+    isDarkMode = theme.brightness == Brightness.dark;
 
     _loadAnswers();
 
@@ -97,7 +100,7 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
                             gradient: LinearGradient(
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
-                              colors: isDarkTheme
+                              colors: isDarkMode
                                   ? [MyColors.primary, MyColors.brightPrimary]
                                   : [MyColors.darkPrimary, MyColors.primary],
                             ),
@@ -156,52 +159,92 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
                           (widget.answersProvided + numberOfAnswers)) *
                       100)
                   .ceil();
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(
-                    "Parabéns",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  content: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Você concluiu a lição!",
-                          style: TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.w600),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text("Tempo: ${totalTimeSpent.inSeconds}s",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16.0)),
-                        Text("Precisão: $precision%",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16.0)),
-                      ],
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        widget.updateProgress(
-                            precision, totalTimeSpent, ELessonType.quiz);
+              // showDialog(
+              //   context: context,
+              //   builder: (context) => AlertDialog(
+              //     title: Text(
+              //       "Parabéns",
+              //       textAlign: TextAlign.center,
+              //       style: TextStyle(fontWeight: FontWeight.bold),
+              //     ),
+              //     content: Padding(
+              //       padding: EdgeInsets.symmetric(horizontal: 5.0),
+              //       child: Column(
+              //         mainAxisAlignment: MainAxisAlignment.start,
+              //         mainAxisSize: MainAxisSize.min,
+              //         children: [
+              //           Text(
+              //             "Você concluiu a lição!",
+              //             style: TextStyle(
+              //                 fontSize: 18.0, fontWeight: FontWeight.w600),
+              //             textAlign: TextAlign.center,
+              //           ),
+              //           Text("Tempo: ${totalTimeSpent.inSeconds}s",
+              //               textAlign: TextAlign.center,
+              //               style: TextStyle(fontSize: 16.0)),
+              //           Text("Precisão: $precision%",
+              //               textAlign: TextAlign.center,
+              //               style: TextStyle(fontSize: 16.0)),
+              //         ],
+              //       ),
+              //     ),
+              //     actions: [
+              //       TextButton(
+              //         onPressed: () async {
+              //           final result = await widget.updateProgress(
+              //               precision, totalTimeSpent, ELessonType.quiz);
+              //           if (result != null) {
+              //             if (mounted) {
+              //               await result.createAlert(context, isDarkTheme);
+              //             }
+              //           }
+              //           if (mounted) {
+              //             Navigator.of(context).pushAndRemoveUntil(
+              //                 MaterialPageRoute(
+              //                     builder: (context) => HomePage()),
+              //                 (route) => false);
+              //           }
+              //         },
+              //         child: Text(
+              //           "Voltar ao início",
+              //           style: TextStyle(color: MyColors.dark),
+              //         ),
+              //       )
+              //     ],
+              //   ),
+              //   barrierDismissible: false,
+              // );
+              alert(
+                context,
+                "Lição concluída!",
+                "Parabéns! Você concluiu sua lição em ${totalTimeSpent.inSeconds ~/ 60} minuto(s) e ${totalTimeSpent.inSeconds % 60} segundo(s)!",
+                [
+                  TextButton(
+                    onPressed: () async {
+                      final result = await widget.updateProgress(
+                          precision, totalTimeSpent, ELessonType.quiz);
+                      if (result != null) {
+                        if (mounted) {
+                          await result.createAlert(context, isDarkMode);
+                        }
+                      }
+                      if (mounted) {
                         Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(builder: (context) => HomePage()),
                             (route) => false);
-                      },
-                      child: Text(
-                        "Voltar ao início",
-                        style: TextStyle(color: MyColors.main6),
+                      }
+                    },
+                    child: Text(
+                      "Voltar ao menu",
+                      style: TextStyle(
+                        color: isDarkMode ? MyColors.light : MyColors.primary,
+                        fontSize: 22.0,
                       ),
-                    )
-                  ],
-                ),
-                barrierDismissible: false,
+                    ),
+                  )
+                ],
+                isDarkMode,
+                dismissible: false,
               );
             } else {
               Timer(const Duration(seconds: 2), () {

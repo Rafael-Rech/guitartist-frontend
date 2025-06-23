@@ -1,7 +1,10 @@
 import 'dart:math' as math;
 
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:tcc/global/alerts.dart';
+import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/Enum/e_subject.dart';
@@ -60,6 +63,8 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
   // bool expanded = false;
   // IconData? sideIcon;
 
+  late bool isDarkMode;
+
   final int numberOfExercisesPerLesson = 5;
   // final int numberOfExercisesPerLesson = 15;
 
@@ -67,6 +72,7 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
 
   @override
   Widget build(BuildContext context) {
+    isDarkMode = AdaptiveTheme.of(context).brightness == Brightness.dark;
     // if (widget.locked) {
     //   sideIcon = Icons.lock;
     //   expanded = false;
@@ -226,30 +232,48 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
                 highlightedComponents: widget.highlightedComponents,
               )));
     } else {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(
-            "LIÇÃO BLOQUEADA",
-            textAlign: TextAlign.center,
-          ),
-          content: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 3.0),
-            child: Text(
-              "Esta lição será desbloqueada quando você atingir uma proficiência de 70% na lição anterior.",
-              textAlign: TextAlign.justify,
-            ),
-          ),
-          actions: [
+      // showDialog(
+      //   context: context,
+      //   builder: (context) => AlertDialog(
+      //     title: Text(
+      //       "LIÇÃO BLOQUEADA",
+      //       textAlign: TextAlign.center,
+      //     ),
+      //     content: Padding(
+      //       padding: EdgeInsets.symmetric(horizontal: 3.0),
+      //       child: Text(
+      //         "Esta lição será desbloqueada quando você atingir uma proficiência de 70% na lição anterior.",
+      //         textAlign: TextAlign.justify,
+      //       ),
+      //     ),
+      //     actions: [
+      //       TextButton(
+      //         onPressed: () {
+      //           Navigator.pop(context);
+      //         },
+      //         child: Text("Ok", style: TextStyle(color: MyColors.dark)),
+      //       )
+      //     ],
+      //   ),
+      // );
+      alert(
+          context,
+          "Lição bloqueada",
+          "Esta lição será desbloqueada quando você atingir uma proficiência de 70% na lição anterior.",
+          [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("Ok", style: TextStyle(color: MyColors.main6)),
-            )
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  "Ok",
+                  style: TextStyle(
+                    color: isDarkMode ? MyColors.gray5 : MyColors.primary,
+                    fontSize: 22.0,
+                  ),
+                ))
           ],
-        ),
-      );
+          isDarkMode);
     }
   }
 
@@ -310,13 +334,13 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
 
     if (user == null) {
       if (mounted) {
-        showErrorAlert();
-      } else {
-        return -1;
+        // showErrorAlert();
+        await EResult.noUser.createAlert(context, isDarkMode);
       }
+      return -1;
     }
 
-    final int noteRepresentation = user!.noteRepresentation;
+    final int noteRepresentation = user.noteRepresentation;
     return noteRepresentation;
   }
 

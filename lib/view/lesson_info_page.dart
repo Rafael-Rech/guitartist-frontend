@@ -2,6 +2,7 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/Enum/e_lesson_type.dart';
@@ -48,7 +49,7 @@ class LessonInfoPage extends StatefulWidget {
 class _LessonInfoPageState extends State<LessonInfoPage> {
   late double screenWidth;
   late double screenHeight;
-
+  late ThemeData theme;
   late bool isDarkMode;
 
   final int numberOfExercisesPerLesson = 5;
@@ -59,15 +60,17 @@ class _LessonInfoPageState extends State<LessonInfoPage> {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
 
-    isDarkMode = AdaptiveTheme.of(context).theme.brightness == Brightness.dark;
+    theme = AdaptiveTheme.of(context).theme;
+    isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: AutoSizeText(
           widget.lessonName,
-          style: TextStyle(fontFamily: "Inter", fontSize: 40.0),
+          style: TextStyle(fontFamily: "Inter", fontSize: 40.0, color: isDarkMode? MyColors.light : MyColors.dark),
           maxLines: 1,
         ),
+        iconTheme: IconThemeData(color: isDarkMode? MyColors.light : MyColors.dark),
         centerTitle: true,
         actions: [],
         flexibleSpace: Container(
@@ -80,6 +83,7 @@ class _LessonInfoPageState extends State<LessonInfoPage> {
           ),
         ),
       ),
+      backgroundColor: theme.colorScheme.surface,
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -88,14 +92,22 @@ class _LessonInfoPageState extends State<LessonInfoPage> {
             Text(
               "Precisão",
               textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: "Inter", fontSize: 40.0),
+              style: TextStyle(
+                fontFamily: "Inter",
+                fontSize: 40.0,
+                color: isDarkMode ? MyColors.light : MyColors.dark,
+              ),
             ),
             _generatePercentIndicator(widget.precision),
             SizedBox(height: 0.025 * screenHeight),
             Text(
               "Proficiência",
               textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: "Inter", fontSize: 40.0),
+              style: TextStyle(
+                fontFamily: "Inter",
+                color: isDarkMode ? MyColors.light : MyColors.dark,
+                fontSize: 40.0,
+              ),
             ),
             _generatePercentIndicator(widget.proficiency),
             SizedBox(height: 0.052 * screenHeight),
@@ -184,13 +196,13 @@ class _LessonInfoPageState extends State<LessonInfoPage> {
 
     if (user == null) {
       if (mounted) {
-        showErrorAlert();
-      } else {
-        return -1;
+        EResult.noUser.createAlert(context, isDarkMode);
+        // showErrorAlert();
       }
+      return -1;
     }
 
-    final int noteRepresentation = user!.noteRepresentation;
+    final int noteRepresentation = user.noteRepresentation;
     return noteRepresentation;
   }
 
@@ -260,7 +272,11 @@ class _LessonInfoPageState extends State<LessonInfoPage> {
       // progressColor: MyColors.brightPrimary,
       center: Text(
         "$percentInt%",
-        style: TextStyle(fontSize: 35.0, fontFamily: "Inter"),
+        style: TextStyle(
+          fontSize: 35.0,
+          fontFamily: "Inter",
+          color: isDarkMode ? MyColors.light : MyColors.darkestPrimary,
+        ),
       ),
     );
   }

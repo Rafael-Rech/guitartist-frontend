@@ -13,7 +13,7 @@ final serverIpAddress = Connection.serverIpAddress;
 final port = Connection.port;
 final baseUrl = "http://$serverIpAddress:$port/api";
 
-Future<EResult?> login(String email, String password) async {
+Future<EResult> login(String email, String password) async {
   Map<String, String> bodyMap = {"email": email, "password": password};
   var bodyJson = json.encode(bodyMap);
 
@@ -48,7 +48,7 @@ Future<EResult?> login(String email, String password) async {
   }
 }
 
-Future<EResult?> register(String username, String email, String password) async {
+Future<EResult> register(String username, String email, String password) async {
   Map<String, dynamic> bodyMap = {
     "name": username,
     "email": email,
@@ -92,7 +92,7 @@ Future<String> getTokenFromDataBase() async {
   return token;
 }
 
-Future<EResult?> getUserFromServer() async {
+Future<EResult> getUserFromServer() async {
   String token = await getTokenFromDataBase();
 
   if (token == "") {
@@ -138,7 +138,7 @@ Future<EResult?> getUserFromServer() async {
   return EResult.fromResponseString(response.body);
 }
 
-Future<EResult?> update(User user) async {
+Future<EResult> update(User user) async {
   Map<String, dynamic> bodyMap = user.toMap();
   bodyMap["time"] = DateConverter.dateToString(DateTime.now());
   var bodyJson = json.encode(bodyMap);
@@ -147,6 +147,9 @@ Future<EResult?> update(User user) async {
     return EResult.noUserId; //TODO: Must go back to the login screen
   }
   String token = await getTokenFromDataBase();
+  if(token == ""){
+    return EResult.noToken;
+  }
 
   http.Response response;
   try {
@@ -175,7 +178,7 @@ Future<EResult?> update(User user) async {
   return EResult.fromResponseString(response.body);
 }
 
-Future<EResult?> delete() async {
+Future<EResult> delete() async {
   User? user = await UserHelper.getUser();
 
   if (user == null) {
@@ -188,6 +191,9 @@ Future<EResult?> delete() async {
     return EResult.noUserId;
   }
   String token = await getTokenFromDataBase();
+  if(token == ""){
+    return EResult.noToken;    
+  }
 
   Map<String, String> headers = {
     "Content-Type": "application/json",
@@ -213,7 +219,7 @@ Future<EResult?> delete() async {
   return EResult.fromResponseString(response.body);
 }
 
-Future<EResult?> changePassword(String password) async {
+Future<EResult> changePassword(String password) async {
   User? user = await UserHelper.getUser();
 
   if (user == null) {

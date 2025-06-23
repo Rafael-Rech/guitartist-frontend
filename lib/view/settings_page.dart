@@ -1,6 +1,8 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
+import 'package:tcc/global/theme.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/user.dart';
 import 'package:tcc/service/user_service.dart';
@@ -48,6 +50,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(color: isDarkMode? MyColors.light : MyColors.dark),
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -85,10 +88,10 @@ class _SettingsPageState extends State<SettingsPage> {
                           "Tema",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 50.0,
-                            fontFamily: "Inter",
-                            color: isDarkMode? MyColors.light : MyColors.dark
-                          ),
+                              fontSize: 50.0,
+                              fontFamily: "Inter",
+                              color:
+                                  isDarkMode ? MyColors.light : MyColors.dark),
                         ),
                         const SizedBox(
                           height: 10.0,
@@ -116,7 +119,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           style: TextStyle(
                             fontSize: 50.0,
                             fontFamily: "Inter",
-                            color: isDarkMode? MyColors.light : MyColors.dark,
+                            color: isDarkMode ? MyColors.light : MyColors.dark,
                           ),
                         ),
                         const SizedBox(
@@ -183,28 +186,31 @@ class _SettingsPageState extends State<SettingsPage> {
       User? user = await UserHelper.getUser();
       if (user != null) {
         highlightedButton = user.noteRepresentation;
-      } else if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("Ocorreu um erro ao obter informações"),
-            content: Text("Você será redirecionado para a tela de login"),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginPage(false)),
-                      (Route<dynamic> route) => false);
-                },
-                child: Text("Ok"),
-              )
-            ],
-          ),
-        );
       } else {
+        if (mounted) {
+          await EResult.noUser.createAlert(context, isDarkMode);
+
+          // showDialog(
+          //   context: context,
+          //   builder: (context) => AlertDialog(
+          //     title: Text("Ocorreu um erro ao obter informações"),
+          //     content: Text("Você será redirecionado para a tela de login"),
+          //     actions: [
+          //       TextButton(
+          //         onPressed: () async {
+          //           Navigator.pop(context);
+          //           Navigator.pushAndRemoveUntil(
+          //               context,
+          //               MaterialPageRoute(
+          //                   builder: (context) => const LoginPage(false)),
+          //               (Route<dynamic> route) => false);
+          //         },
+          //         child: Text("Ok"),
+          //       )
+          //     ],
+          //   ),
+          // );
+        }
         return false;
       }
     }
@@ -264,35 +270,39 @@ class _SettingsPageState extends State<SettingsPage> {
     if (user == null) {
       if (mounted) {
         // Navigator.pop(context);
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("Ocorreu um erro ao atualizar as informações"),
-            content: Text("Você será redirecionado para a tela de login"),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginPage(false)),
-                      (Route<dynamic> route) => false);
-                },
-                child: Text("Ok"),
-              )
-            ],
-          ),
-        );
-      } else {
-        return;
+        // showDialog(
+        //   context: context,
+        //   builder: (context) => AlertDialog(
+        //     title: Text("Ocorreu um erro ao atualizar as informações"),
+        //     content: Text("Você será redirecionado para a tela de login"),
+        //     actions: [
+        //       TextButton(
+        //         onPressed: () async {
+        //           Navigator.pop(context);
+        //           Navigator.pushAndRemoveUntil(
+        //               context,
+        //               MaterialPageRoute(
+        //                   builder: (context) => const LoginPage(false)),
+        //               (Route<dynamic> route) => false);
+        //         },
+        //         child: Text("Ok"),
+        //       )
+        //     ],
+        //   ),
+        // );
+
+        EResult.noUser.createAlert(context, isDarkMode);
       }
+      return;
     }
 
     user!.noteRepresentation = representation;
-    final String response = await update(user);
-    if (response == "OK") {
+    final EResult response = await update(user);
+
+    if (response == EResult.ok) {
       await UserHelper.saveUser(user);
+    } else if (mounted) {
+      await response.createAlert(context, isDarkMode);
     }
     // if (mounted) {
     //   Navigator.pop(context);

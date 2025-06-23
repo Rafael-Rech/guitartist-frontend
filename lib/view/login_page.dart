@@ -1,6 +1,7 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/service/user_service.dart';
 import 'package:tcc/view/components/my_horizontal_button.dart';
@@ -215,9 +216,7 @@ class _LoginPageState extends State<LoginPage> {
       style: TextStyle(
         fontFamily: "Inter",
         fontWeight: FontWeight.normal,
-        color: isDarkMode
-            ? MyColors.light
-            : MyColors.dark,
+        color: isDarkMode ? MyColors.light : MyColors.dark,
         fontSize: 40.0,
       ),
     );
@@ -233,7 +232,7 @@ class _LoginPageState extends State<LoginPage> {
     return MyTextFormField(
       labelText: labelText,
       fill: true,
-      labelColor: isDarkMode? MyColors.light : MyColors.gray1,
+      labelColor: isDarkMode ? MyColors.light : MyColors.gray1,
       obscureText: useObscureText ? !passwordVisible : null,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
@@ -242,7 +241,7 @@ class _LoginPageState extends State<LoginPage> {
               ? Color(0x00000000)
               // : MyColors.brightestPrimary,
               : MyColors.gray4,
-          width: isDarkMode? 0.0 : 3.0,
+          width: isDarkMode ? 0.0 : 3.0,
         ),
       ),
       controller: controller,
@@ -273,6 +272,7 @@ class _LoginPageState extends State<LoginPage> {
             fontSize: 20.0,
             fontWeight: FontWeight.normal,
             fontFamily: "Roboto",
+            color: isDarkMode? MyColors.light : MyColors.dark
           ),
         ),
         TextButton(
@@ -286,7 +286,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Text(
             widget.isRegistering ? "Entrar" : "Registre-se",
             style: TextStyle(
-              color: isDarkMode? Color(0xFF136CD3): Color(0xFF0E4C94),
+              color: isDarkMode ? Color(0xFF3B8EED) : Color(0xFF0E4C94),
               fontSize: 20.0,
               fontFamily: "Roboto",
             ),
@@ -333,8 +333,8 @@ class _LoginPageState extends State<LoginPage> {
             )),
         barrierDismissible: false);
 
-    final String loginResult = await login(email, password);
-    if (loginResult == "OK") {
+    final EResult loginResult = await login(email, password);
+    if (loginResult == EResult.ok) {
       if (mounted) {
         waitingForResponse = false;
         Navigator.of(context).pop();
@@ -346,43 +346,47 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       if (mounted) {
         waitingForResponse = false;
-        Navigator.of(context).pop();
-        return showDialog<void>(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text("Erro ao efetuar login"),
-              content: Text(loginResult),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text("Ok"))
-              ],
-            );
-          },
-        );
+        // Navigator.of(context).pop();
+        // return showDialog<void>(
+        //   context: context,
+        //   builder: (context) {
+        //     return AlertDialog(
+        //       title: Text("Erro ao efetuar login"),
+        //       content: Text(loginResult),
+        //       actions: [
+        //         TextButton(
+        //             onPressed: () {
+        //               Navigator.of(context).pop();
+        //             },
+        //             child: Text("Ok"))
+        //       ],
+        //     );
+        //   },
+        // );
+        Navigator.pop(context);
+        await loginResult.createAlert(context, isDarkMode);
       }
     }
   }
 
   Future<void> registerFunction() async {
+    print("Register");
     if (waitingForResponse || !_formKey.currentState!.validate()) {
       return;
     }
+    print("a");
     final String username = usernameController.text;
     final String email = emailController.text;
     final String password = passwordController.text;
     waitingForResponse = true;
     showDialog(
         context: context,
-        builder: (context) =>
-            Center(child: CircularProgressIndicator(color: MyColors.brightPrimary)),
+        builder: (context) => Center(
+            child: CircularProgressIndicator(color: MyColors.brightPrimary)),
         barrierDismissible: false);
 
-    final String registerResult = await register(username, email, password);
-    if (registerResult == "CREATED") {
+    final EResult registerResult = await register(username, email, password);
+    if (registerResult == EResult.ok) {
       if (mounted) {
         waitingForResponse = false;
         Navigator.of(context).pop();
@@ -394,18 +398,20 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       if (mounted) {
         waitingForResponse = false;
-        Navigator.of(context).pop();
-        return createAlert(
-          "ERRO AO REGISTRAR USUÁRIO",
-          /*"Tente novamente mais tarde"*/ registerResult,
-          [
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text("Ok"))
-          ],
-        );
+        // Navigator.of(context).pop();
+        // return createAlert(
+        //   "ERRO AO REGISTRAR USUÁRIO",
+        //   /*"Tente novamente mais tarde"*/ registerResult,
+        //   [
+        //     TextButton(
+        //         onPressed: () {
+        //           Navigator.of(context).pop();
+        //         },
+        //         child: Text("Ok"))
+        //   ],
+        // );
+        Navigator.pop(context);
+        await registerResult.createAlert(context, isDarkMode);
       }
     }
   }

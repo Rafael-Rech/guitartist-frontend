@@ -10,7 +10,7 @@ class LessonHelpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: MyColors.main5,
+        // backgroundColor: MyColors.main5,
       ),
       body: Center(child: Text("Lesson ID: $lessonId"),),
     );

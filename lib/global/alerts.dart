@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:tcc/global/my_colors.dart';
 
 Future<void> alert(BuildContext context, String title, String content,
-    List<Widget> actions, bool isDarkTheme, {MainAxisAlignment? actionsAlignment, bool dismissible = true}) async {
+    List<Widget> actions, bool isDarkTheme,
+    {MainAxisAlignment? actionsAlignment,
+    bool dismissible = true,
+    TextAlign textAlign = TextAlign.start}) async {
   await showDialog(
     context: context,
     barrierDismissible: dismissible,
@@ -20,6 +23,7 @@ Future<void> alert(BuildContext context, String title, String content,
       ),
       content: Text(
         content,
+        textAlign: textAlign,
         style: TextStyle(
           fontFamily: "Roboto",
           fontSize: 24.0,

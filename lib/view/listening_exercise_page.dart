@@ -6,6 +6,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_sound/public/flutter_sound_player.dart';
+import 'package:tcc/global/alerts.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/lesson_helper.dart';
 import 'package:tcc/helper/user_helper.dart';
@@ -49,6 +50,12 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
 
   final List<AudioPlayer> players = [];
 
+  late bool isDarkMode;
+
+  bool pressingButton = false;
+  late Color iconColor;
+  late Color buttonColor;
+
   final List<Widget> _answers = [
     Container(),
     Container(),
@@ -81,13 +88,18 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
     screenHeight = MediaQuery.of(context).size.height;
 
     ThemeData theme = AdaptiveTheme.of(context).theme;
-    bool isDarkTheme = theme.brightness == Brightness.dark;
+    isDarkMode = theme.brightness == Brightness.dark;
+
+    if (!pressingButton) {
+      buttonColor = isDarkMode ? MyColors.gray3 : MyColors.light;
+      iconColor = isDarkMode ? MyColors.light : MyColors.brightPrimary;
+    }
 
     _loadAnswers();
 
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result){},
+      onPopInvokedWithResult: (didPop, result) {},
       child: Scaffold(
         body: Container(
           width: screenWidth,
@@ -123,7 +135,7 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
                             gradient: LinearGradient(
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
-                              colors: isDarkTheme
+                              colors: isDarkMode
                                   ? [MyColors.primary, MyColors.brightPrimary]
                                   : [MyColors.darkPrimary, MyColors.primary],
                             ),
@@ -151,26 +163,50 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
                                             exercise.playAudiosAtSameTime);
                                       }
                                     },
+                                    onTapDown: (details) {
+                                      setState(() {
+                                        pressingButton = true;
+                                        buttonColor = isDarkMode
+                                            ? MyColors.gray2
+                                            : MyColors.gray4;
+                                        iconColor = isDarkMode
+                                            ? MyColors.primary
+                                            : MyColors.primary;
+                                      });
+                                    },
+                                    onTapUp: (details) {
+                                      setState(() {
+                                        pressingButton = false;
+                                      });
+                                    },
+                                    onTapCancel: () {
+                                      setState(() {
+                                        pressingButton = false;
+                                      });
+                                    },
                                     child: Container(
                                       height: 0.0656 * screenHeight,
                                       width: 0.6767 * screenWidth,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
                                         border: Border.all(
-                                          color: isDarkTheme
+                                          color: isDarkMode
                                               ? MyColors.darkPrimary
                                               : MyColors.gray1,
                                           width: 3.0,
                                         ),
-                                        color: isDarkTheme
-                                            ? MyColors.gray3
-                                            : MyColors.light,
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color:
+                                                  Color.fromARGB(120, 5, 5, 5),
+                                              blurRadius: 5,
+                                              offset: Offset(-1, 8))
+                                        ],
+                                        color: buttonColor,
                                       ),
                                       child: Icon(
                                         Icons.music_note,
-                                        color: isDarkTheme
-                                            ? MyColors.light
-                                            : MyColors.brightPrimary,
+                                        color: iconColor,
                                         size: 0.055 * screenHeight,
                                       ),
                                     ),
@@ -190,95 +226,6 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
         ),
       ),
     );
-
-    // return Scaffold(
-    //   appBar: appBar,
-    //   body: Column(
-    //     mainAxisAlignment: MainAxisAlignment.center,
-    //     children: [
-    //       SizedBox(
-    //         height: screenHeight -
-    //             AppBar().preferredSize.height -
-    //             1.5 * answersHeight,
-    //         child: Center(
-    //           child: Padding(
-    //             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
-    //             child: Column(children: [
-    //               Container(
-    //                 width: screenWidth * 0.4,
-    //                 height: screenWidth * 0.4,
-    //                 decoration: BoxDecoration(
-    //                     color: MyColors.main4,
-    //                     borderRadius: BorderRadius.circular(360)),
-    //                 child: IconButton(
-    //                   icon: Icon(
-    //                     Icons.music_note,
-    //                     color: MyColors.neutral2,
-    //                   ),
-    //                   iconSize: 100.0,
-    //                   onPressed: () async {
-    //                     if(!playingAudio){
-    //                       await playAudio(exercise.playAudiosAtSameTime);
-    //                     }
-    //                   },
-    //                 ),
-    //               ),
-    //               const SizedBox(
-    //                 height: 10.0,
-    //               ),
-    //               Text(
-    //                 exercise.question,
-    //                 textAlign: TextAlign.center,
-    //                 style:
-    //                     TextStyle(fontWeight: FontWeight.bold, fontSize: 28.0),
-    //               ),
-    //             ]),
-    //           ),
-    //         ),
-    //       ),
-    //       SizedBox(
-    //         height: answersHeight * 1.2,
-    //         child: Row(
-    //           mainAxisAlignment: MainAxisAlignment.spaceAround,
-    //           children: [
-    //             Column(
-    //               mainAxisAlignment: MainAxisAlignment.end,
-    //               children: [
-    //                 const SizedBox(
-    //                   height: 25.0,
-    //                 ),
-    //                 _answers[0],
-    //                 const SizedBox(
-    //                   height: 10.0,
-    //                 ),
-    //                 _answers[1],
-    //                 const SizedBox(
-    //                   height: 25.0,
-    //                 ),
-    //               ],
-    //             ),
-    //             Column(
-    //               mainAxisAlignment: MainAxisAlignment.end,
-    //               children: [
-    //                 const SizedBox(
-    //                   height: 25.0,
-    //                 ),
-    //                 _answers[2],
-    //                 const SizedBox(
-    //                   height: 10.0,
-    //                 ),
-    //                 _answers[3],
-    //                 const SizedBox(
-    //                   height: 25.0,
-    //                 ),
-    //               ],
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    // );
   }
 
   void _initPlayers() {
@@ -293,31 +240,6 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
   }
 
   Future<void> playAudio(bool playAudiosAtSameTime) async {
-    // if (playAudiosAtSameTime) {
-    //   // List<AudioPlayer> players = paths.map((path) => AudioPlayer()).toList();
-
-    //   // await Future.wait(players.map((player) async {
-    //   //   await player.setAsset(paths[players.indexOf(player)]);
-    //   //   await player.play();
-    //   // }));
-
-    //   final delay = Duration(milliseconds: 750);
-
-    //   for (int i = 0; i < exercise.audioPaths.length; i++) {
-    //     Future.delayed(delay * i, () async {
-    //       await players[i].setAsset(exercise.audioPaths[i]);
-    //       await players[i].play();
-    //     });
-    //   }
-    // } else {
-    //   for (int i = 0; i < exercise.audioPaths.length; i++) {
-    //     await players[i].setAsset(exercise.audioPaths[i]);
-    //     await players[i].play();
-    //     await players[i]
-    //         .processingStateStream
-    //         .firstWhere((state) => state == ProcessingState.completed);
-    //   }
-    // }
     playingAudio = true;
     final Duration delay = (playAudiosAtSameTime)
         ? Duration(milliseconds: 750)
@@ -358,52 +280,37 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
                           (widget.answersProvided + numberOfAnswers)) *
                       100)
                   .ceil();
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(
-                    "Parabéns",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  content: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Você concluiu a lição!",
-                          style: TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.w600),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text("Tempo: ${totalTimeSpent.inSeconds}s",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16.0)),
-                        Text("Precisão: $precision%",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16.0)),
-                      ],
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        widget.updateProgress(
-                            precision, totalTimeSpent, ELessonType.quiz);
+              alert(
+                context,
+                "Lição concluída!",
+                "Parabéns! Você concluiu sua lição em ${totalTimeSpent.inSeconds ~/ 60} minuto(s) e ${totalTimeSpent.inSeconds % 60} segundo(s)!",
+                [
+                  TextButton(
+                    onPressed: () async {
+                      final result = await widget.updateProgress(
+                          precision, totalTimeSpent, ELessonType.listening);
+                      if (result != null) {
+                        if (mounted) {
+                          await result.createAlert(context, isDarkMode);
+                        }
+                      }
+                      if (mounted) {
                         Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(builder: (context) => HomePage()),
                             (route) => false);
-                      },
-                      child: Text(
-                        "Voltar ao início",
-                        style: TextStyle(color: MyColors.main6),
+                      }
+                    },
+                    child: Text(
+                      "Voltar ao menu",
+                      style: TextStyle(
+                        color: isDarkMode ? MyColors.light : MyColors.primary,
+                        fontSize: 22.0,
                       ),
-                    )
-                  ],
-                ),
-                barrierDismissible: false,
+                    ),
+                  )
+                ],
+                isDarkMode,
+                dismissible: false,
               );
             } else {
               Timer(const Duration(seconds: 2), () {
@@ -437,155 +344,4 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
 
     setState(() {});
   }
-
-  // void _loadAnswers() {
-  //   _answers.clear();
-  //   for (int i = 0; i < 4; i++) {
-  //     late Color backgroundColor;
-  //     late Color borderColor;
-
-  //     if (answersTried[i]) {
-  //       if (exercise.options[i].isCorrect) {
-  //         backgroundColor = Colors.lightGreen;
-  //         borderColor = Colors.green;
-  //       } else {
-  //         backgroundColor = MyColors.main4;
-  //         borderColor = MyColors.main8;
-  //       }
-  //     } else {
-  //       backgroundColor = MyColors.secondary5;
-  //       borderColor = MyColors.secondary7;
-  //     }
-
-  //     _answers.add(
-  //       MyTextButton(
-  //           onPressed: () async {
-  //             if (answersTried[i] || blocked) {
-  //               return;
-  //             }
-  //             setState(() {
-  //               answersTried[i] = true;
-  //             });
-  //             if (exercise.options[i].isCorrect) {
-  //               blocked = true;
-  //               int numberOfAnswers = 0;
-  //               for (bool tried in answersTried) {
-  //                 if (tried) {
-  //                   numberOfAnswers++;
-  //                 }
-  //               }
-  //               if (widget.index == widget.exercises.length - 1) {
-  //                 final totalTimeSpent =
-  //                     widget.timeSpent + DateTime.now().difference(startTime);
-  //                 final precision = (((widget.correctAnswersProvided + 1) /
-  //                             (widget.answersProvided + numberOfAnswers)) *
-  //                         100)
-  //                     .ceil();
-  //                 // showDialog(
-  //                 //   context: context,
-  //                 //   builder: (context) => AlertDialog(
-  //                 //     title: Text("Boa :D"),
-  //                 //     actions: [
-  //                 //       TextButton(
-  //                 //         onPressed: () {
-  //                 //           _updateProgress(
-  //                 //               widget.answersProvided + numberOfAnswers,
-  //                 //               widget.correctAnswersProvided + 1,
-  //                 //               widget.timeSpent +
-  //                 //                   DateTime.now().difference(startTime));
-  //                 //           Navigator.of(context).pushAndRemoveUntil(
-  //                 //               MaterialPageRoute(
-  //                 //                   builder: (context) => HomePage()),
-  //                 //               (route) => false);
-  //                 //         },
-  //                 //         child: Text("Voltar ao início"),
-  //                 //       )
-  //                 //     ],
-  //                 //   ),
-  //                 //   barrierDismissible: false,
-  //                 // );
-  //                 showDialog(
-  //                   context: context,
-  //                   builder: (context) => AlertDialog(
-  //                     title: Text(
-  //                       "Parabéns",
-  //                       textAlign: TextAlign.center,
-  //                       style: TextStyle(fontWeight: FontWeight.bold),
-  //                     ),
-  //                     content: Padding(
-  //                       padding: EdgeInsets.symmetric(horizontal: 5.0),
-  //                       child: Column(
-  //                         mainAxisAlignment: MainAxisAlignment.start,
-  //                         mainAxisSize: MainAxisSize.min,
-  //                         children: [
-  //                           Text(
-  //                             "Você concluiu a lição!",
-  //                             style: TextStyle(
-  //                                 fontSize: 18.0, fontWeight: FontWeight.w600),
-  //                             textAlign: TextAlign.center,
-  //                           ),
-  //                           Text("Tempo: ${totalTimeSpent.inSeconds}s",
-  //                               textAlign: TextAlign.center,
-  //                               style: TextStyle(fontSize: 16.0)),
-  //                           Text("Precisão: $precision%",
-  //                               textAlign: TextAlign.center,
-  //                               style: TextStyle(fontSize: 16.0)),
-  //                         ],
-  //                       ),
-  //                     ),
-  //                     actions: [
-  //                       TextButton(
-  //                         onPressed: () {
-  //                           widget.updateProgress(precision, totalTimeSpent,
-  //                               ELessonType.listening);
-  //                           Navigator.of(context).pushAndRemoveUntil(
-  //                               MaterialPageRoute(
-  //                                   builder: (context) => HomePage()),
-  //                               (route) => false);
-  //                         },
-  //                         child: Text(
-  //                           "Voltar ao início",
-  //                           style: TextStyle(color: MyColors.main6),
-  //                         ),
-  //                       )
-  //                     ],
-  //                   ),
-  //                   barrierDismissible: false,
-  //                 );
-  //               } else {
-  //                 Timer(const Duration(seconds: 2), () {
-  //                   Navigator.pushReplacement(
-  //                     context,
-  //                     ExercisePage.createAnimatedRoute(
-  //                       ListeningExercisePage(
-  //                         widget.id,
-  //                         widget.exercises,
-  //                         widget.index + 1,
-  //                         answersProvided:
-  //                             widget.answersProvided + numberOfAnswers,
-  //                         correctAnswersProvided:
-  //                             widget.correctAnswersProvided + 1,
-  //                         timeSpent: widget.timeSpent +
-  //                             DateTime.now().difference(startTime),
-  //                         subject: widget.subject,
-  //                       ),
-  //                     ),
-  //                   );
-  //                 });
-  //               }
-  //             }
-  //           },
-  //           backgroundColor: backgroundColor,
-  //           borderColor: borderColor,
-  //           borderWidth: 2.0,
-  //           textColor: Colors.black,
-  //           width: screenWidth * 0.4,
-  //           height: screenWidth * 0.4,
-  //           fontSize: 26.0,
-  //           text: exercise.options[i].text),
-  //     );
-  //   }
-
-  //   setState(() {});
-  // }
 }
