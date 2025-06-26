@@ -247,7 +247,7 @@ class _QuizExercisePageState extends State<QuizExercisePage> {
                 dismissible: false,
               );
             } else {
-              Timer(const Duration(seconds: 2), () {
+              Timer(widget.answerToPushDuration, () {
                 Navigator.pushReplacement(
                   context,
                   ExercisePage.createAnimatedRoute(

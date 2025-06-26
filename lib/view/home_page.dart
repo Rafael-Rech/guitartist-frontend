@@ -1,4 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
@@ -53,15 +54,98 @@ class _HomePageState extends State<HomePage> {
     theme = AdaptiveTheme.of(context).theme;
     isDarkMode = theme.brightness == Brightness.dark;
 
+    // return PopScope(
+    //     canPop: false,
+    //     onPopInvokedWithResult: (didPop, result) async {},
+    //     child: Scaffold(
+    //       appBar: PreferredSize(
+    //         preferredSize: Size.fromHeight(0.2 * screenHeight),
+    //         // preferredSize: Size.fromHeight(0.266 * screenHeight),
+    //         child: _generateAppBar(),
+    //       ),
+    //       backgroundColor: theme.colorScheme.surface,
+    //       floatingActionButton: FloatingActionButton.large(
+    //         shape: CircleBorder(),
+    //         onPressed: () {
+    //           if (!areLessonsLoaded()) {
+    //             return;
+    //           }
+    //           Navigator.of(context).push(MaterialPageRoute(
+    //               builder: (context) => const MetronomePage()));
+    //         },
+    //         backgroundColor:
+    //             isDarkMode ? MyColors.brightPrimary : MyColors.primary,
+    //         elevation: 10.0,
+    //         child: Padding(
+    //             padding: EdgeInsets.all(10.0),
+    //             child: Image(
+    //               image: AssetImage(
+    //                   "assets/imgs/metronomeIcon${isDarkMode ? 'Claro' : 'Escuro'}.png"),
+    //             )),
+    //       ),
+    //       body: GestureDetector(
+    //         onHorizontalDragStart: (details) {
+    //           // print(details.localPosition);
+    //           movementStart = details.localPosition;
+    //         },
+    //         onHorizontalDragEnd: (details) {
+    //           // print(details.localPosition);
+    //           if (!areLessonsLoaded()) {
+    //             return;
+    //           }
+    //           if (movementStart != null) {
+    //             if (movementStart!.dx < details.localPosition.dx &&
+    //                 pageIndex > 0) {
+    //               setState(() {
+    //                 pageIndex--;
+    //               });
+    //             } else if (movementStart!.dx > details.localPosition.dx &&
+    //                 pageIndex < 3) {
+    //               setState(() {
+    //                 pageIndex++;
+    //               });
+    //             }
+    //             movementStart = null;
+    //           }
+    //         },
+    //         child: SingleChildScrollView(
+    //           child: Center(
+    //             child: FutureBuilder(
+    //               future: _loadProgress(),
+    //               builder: (context, snapshot) {
+    //                 if (!snapshot.hasData) {
+    //                   // if (!(snapshot.connectionState == ConnectionState.done)) {
+    //                   print("No data");
+    //                   return SizedBox(
+    //                       height: screenHeight * 0.8 - 150.0,
+    //                       child: Center(
+    //                           child: CircularProgressIndicator(
+    //                         color: MyColors.brightPrimary,
+    //                       )));
+    //                 }
+    //                 return Column(
+    //                   mainAxisAlignment: MainAxisAlignment.center,
+    //                   crossAxisAlignment: CrossAxisAlignment.center,
+    //                   children:
+    //                       _buildExerciseButtons(ESubject.values[pageIndex]),
+    //                 );
+    //               },
+    //             ),
+    //           ),
+    //         ),
+    //       ),
+    //       bottomNavigationBar: _generateBottomNavigationBar(),
+    //     ));
+
     return PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) async {},
         child: Scaffold(
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(0.2 * screenHeight),
-            // preferredSize: Size.fromHeight(0.266 * screenHeight),
-            child: _generateAppBar(),
-          ),
+          // appBar: PreferredSize(
+          //   preferredSize: Size.fromHeight(0.2 * screenHeight),
+          //   // preferredSize: Size.fromHeight(0.266 * screenHeight),
+          //   child: _generateAppBar(),
+          // ),
           backgroundColor: theme.colorScheme.surface,
           floatingActionButton: FloatingActionButton.large(
             shape: CircleBorder(),
@@ -82,56 +166,63 @@ class _HomePageState extends State<HomePage> {
                       "assets/imgs/metronomeIcon${isDarkMode ? 'Claro' : 'Escuro'}.png"),
                 )),
           ),
-          body: GestureDetector(
-            onHorizontalDragStart: (details) {
-              // print(details.localPosition);
-              movementStart = details.localPosition;
-            },
-            onHorizontalDragEnd: (details) {
-              // print(details.localPosition);
-              if (!areLessonsLoaded()) {
-                return;
-              }
-              if (movementStart != null) {
-                if (movementStart!.dx < details.localPosition.dx &&
-                    pageIndex > 0) {
-                  setState(() {
-                    pageIndex--;
-                  });
-                } else if (movementStart!.dx > details.localPosition.dx &&
-                    pageIndex < 3) {
-                  setState(() {
-                    pageIndex++;
-                  });
-                }
-                movementStart = null;
-              }
-            },
-            child: SingleChildScrollView(
-              child: Center(
-                child: FutureBuilder(
-                  future: _loadProgress(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      // if (!(snapshot.connectionState == ConnectionState.done)) {
-                      print("No data");
-                      return SizedBox(
-                          height: screenHeight * 0.8 - 150.0,
-                          child: Center(
-                              child: CircularProgressIndicator(
-                            color: MyColors.brightPrimary,
-                          )));
-                    }
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children:
-                          _buildExerciseButtons(ESubject.values[pageIndex]),
-                    );
+          body: CustomScrollView(
+            slivers: [
+              _generateSliverAppBar(),
+              SliverToBoxAdapter(
+                child: GestureDetector(
+                  onHorizontalDragStart: (details) {
+                    // print(details.localPosition);
+                    movementStart = details.localPosition;
                   },
+                  onHorizontalDragEnd: (details) {
+                    // print(details.localPosition);
+                    if (!areLessonsLoaded()) {
+                      return;
+                    }
+                    if (movementStart != null) {
+                      if (movementStart!.dx < details.localPosition.dx &&
+                          pageIndex > 0) {
+                        setState(() {
+                          pageIndex--;
+                        });
+                      } else if (movementStart!.dx > details.localPosition.dx &&
+                          pageIndex < 3) {
+                        setState(() {
+                          pageIndex++;
+                        });
+                      }
+                      movementStart = null;
+                    }
+                  },
+                  child: SingleChildScrollView(
+                    child: Center(
+                      child: FutureBuilder(
+                        future: _loadProgress(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            // if (!(snapshot.connectionState == ConnectionState.done)) {
+                            print("No data");
+                            return SizedBox(
+                                height: screenHeight * 0.8 - 150.0,
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                  color: MyColors.brightPrimary,
+                                )));
+                          }
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: _buildExerciseButtons(
+                                ESubject.values[pageIndex]),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              )
+            ],
           ),
           bottomNavigationBar: _generateBottomNavigationBar(),
         ));
@@ -220,6 +311,98 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+    );
+  }
+
+  SliverAppBar _generateSliverAppBar() {
+    List<Color> colors = [MyColors.primary, MyColors.brightestPrimary];
+    if (isDarkMode) {
+      colors = List.from(colors.reversed);
+    }
+    String title = "Notas";
+    switch (pageIndex) {
+      case 1:
+        title = "Intervalos";
+        break;
+      case 2:
+        title = "Escalas";
+        break;
+      case 3:
+        title = "Acordes";
+        break;
+    }
+
+    return SliverAppBar(
+      leading: IconButton(
+          onPressed: () {
+            if (!areLessonsLoaded()) {
+              return;
+            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AccountPage()),
+            );
+          },
+          icon: Icon(
+            Icons.person,
+            color: isDarkMode ? MyColors.light : MyColors.dark,
+          )),
+      actions: [
+        IconButton(
+          // iconSize: 100.0,
+          icon: Icon(
+            Icons.settings,
+            color: isDarkMode ? MyColors.light : MyColors.dark,
+          ),
+          onPressed: () {
+            if (!areLessonsLoaded()) {
+              return;
+            }
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()));
+          },
+        )
+      ],
+      expandedHeight: screenHeight * 0.266,
+      elevation: 5.0,
+      shadowColor: Color(0x88444444),
+      pinned: true,
+      flexibleSpace: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+        bool collapsed =
+            MediaQuery.of(context).padding.top + 2 * kToolbarHeight >
+                constraints.biggest.height;
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: colors,
+            ),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                left: collapsed ? kToolbarHeight : 5.0,
+                bottom: collapsed ? 0.0 : 5.0,
+                child: SizedBox(
+                  width: screenWidth - 2 * kToolbarHeight,
+                  // color: Colors.amber,
+                  child: AutoSizeText(
+                    title,
+                    textAlign: collapsed ? TextAlign.center : TextAlign.left,
+                    style: TextStyle(
+                      fontSize: collapsed ? 50.0 : 60.0,
+                      fontFamily: "Inter",
+                      color: isDarkMode ? MyColors.light : MyColors.dark,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      }),
     );
   }
 

@@ -125,7 +125,7 @@ enum EResult {
           child: Text(
             "Ok",
             style: TextStyle(
-              color: isDarkTheme ? MyColors.brightPrimary : MyColors.primary,
+              color: isDarkTheme ? MyColors.light : MyColors.primary,
               fontSize: 22.0,
             ),
           ),

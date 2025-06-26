@@ -25,6 +25,8 @@ class ExercisePage extends StatefulWidget {
   final Duration timeSpent;
   final ESubject subject;
 
+  final Duration answerToPushDuration = const Duration(milliseconds: 1500);
+
   static Route createAnimatedRoute(Widget page) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => page,

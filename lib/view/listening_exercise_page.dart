@@ -313,7 +313,7 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
                 dismissible: false,
               );
             } else {
-              Timer(const Duration(seconds: 2), () {
+              Timer(widget.answerToPushDuration, () {
                 Navigator.pushReplacement(
                   context,
                   ExercisePage.createAnimatedRoute(
