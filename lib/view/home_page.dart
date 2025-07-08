@@ -15,8 +15,6 @@ import 'package:tcc/music_theory_components/lesson_data/scale_lessons.dart';
 import 'package:tcc/service/user_service.dart';
 import 'package:tcc/view/account_page.dart';
 import 'package:tcc/view/components/lesson_menu_button.dart';
-import 'package:tcc/view/components/main_menu_option.dart';
-import 'package:tcc/view/login_page.dart';
 import 'package:tcc/view/metronome_page.dart';
 import 'package:tcc/view/settings_page.dart';
 
@@ -54,98 +52,10 @@ class _HomePageState extends State<HomePage> {
     theme = AdaptiveTheme.of(context).theme;
     isDarkMode = theme.brightness == Brightness.dark;
 
-    // return PopScope(
-    //     canPop: false,
-    //     onPopInvokedWithResult: (didPop, result) async {},
-    //     child: Scaffold(
-    //       appBar: PreferredSize(
-    //         preferredSize: Size.fromHeight(0.2 * screenHeight),
-    //         // preferredSize: Size.fromHeight(0.266 * screenHeight),
-    //         child: _generateAppBar(),
-    //       ),
-    //       backgroundColor: theme.colorScheme.surface,
-    //       floatingActionButton: FloatingActionButton.large(
-    //         shape: CircleBorder(),
-    //         onPressed: () {
-    //           if (!areLessonsLoaded()) {
-    //             return;
-    //           }
-    //           Navigator.of(context).push(MaterialPageRoute(
-    //               builder: (context) => const MetronomePage()));
-    //         },
-    //         backgroundColor:
-    //             isDarkMode ? MyColors.brightPrimary : MyColors.primary,
-    //         elevation: 10.0,
-    //         child: Padding(
-    //             padding: EdgeInsets.all(10.0),
-    //             child: Image(
-    //               image: AssetImage(
-    //                   "assets/imgs/metronomeIcon${isDarkMode ? 'Claro' : 'Escuro'}.png"),
-    //             )),
-    //       ),
-    //       body: GestureDetector(
-    //         onHorizontalDragStart: (details) {
-    //           // print(details.localPosition);
-    //           movementStart = details.localPosition;
-    //         },
-    //         onHorizontalDragEnd: (details) {
-    //           // print(details.localPosition);
-    //           if (!areLessonsLoaded()) {
-    //             return;
-    //           }
-    //           if (movementStart != null) {
-    //             if (movementStart!.dx < details.localPosition.dx &&
-    //                 pageIndex > 0) {
-    //               setState(() {
-    //                 pageIndex--;
-    //               });
-    //             } else if (movementStart!.dx > details.localPosition.dx &&
-    //                 pageIndex < 3) {
-    //               setState(() {
-    //                 pageIndex++;
-    //               });
-    //             }
-    //             movementStart = null;
-    //           }
-    //         },
-    //         child: SingleChildScrollView(
-    //           child: Center(
-    //             child: FutureBuilder(
-    //               future: _loadProgress(),
-    //               builder: (context, snapshot) {
-    //                 if (!snapshot.hasData) {
-    //                   // if (!(snapshot.connectionState == ConnectionState.done)) {
-    //                   print("No data");
-    //                   return SizedBox(
-    //                       height: screenHeight * 0.8 - 150.0,
-    //                       child: Center(
-    //                           child: CircularProgressIndicator(
-    //                         color: MyColors.brightPrimary,
-    //                       )));
-    //                 }
-    //                 return Column(
-    //                   mainAxisAlignment: MainAxisAlignment.center,
-    //                   crossAxisAlignment: CrossAxisAlignment.center,
-    //                   children:
-    //                       _buildExerciseButtons(ESubject.values[pageIndex]),
-    //                 );
-    //               },
-    //             ),
-    //           ),
-    //         ),
-    //       ),
-    //       bottomNavigationBar: _generateBottomNavigationBar(),
-    //     ));
-
     return PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) async {},
         child: Scaffold(
-          // appBar: PreferredSize(
-          //   preferredSize: Size.fromHeight(0.2 * screenHeight),
-          //   // preferredSize: Size.fromHeight(0.266 * screenHeight),
-          //   child: _generateAppBar(),
-          // ),
           backgroundColor: theme.colorScheme.surface,
           floatingActionButton: FloatingActionButton.large(
             shape: CircleBorder(),
@@ -201,8 +111,8 @@ class _HomePageState extends State<HomePage> {
                         future: _loadProgress(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            // if (!(snapshot.connectionState == ConnectionState.done)) {
-                            print("No data");
+                          // if (snapshot.connectionState !=
+                              // ConnectionState.done) {
                             return SizedBox(
                                 height: screenHeight * 0.8 - 150.0,
                                 child: Center(
@@ -232,87 +142,6 @@ class _HomePageState extends State<HomePage> {
     return (lessonData.length == 4 && lessons.length == 4);
   }
 
-  AppBar _generateAppBar() {
-    List<Color> colors = [MyColors.primary, MyColors.brightestPrimary];
-    if (isDarkMode) {
-      colors = List.from(colors.reversed);
-    }
-    String title = "Notas";
-    switch (pageIndex) {
-      case 1:
-        title = "Intervalos";
-        break;
-      case 2:
-        title = "Escalas";
-        break;
-      case 3:
-        title = "Acordes";
-        break;
-    }
-
-    return AppBar(
-      leading: IconButton(
-          onPressed: () {
-            if (!areLessonsLoaded()) {
-              return;
-            }
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AccountPage()),
-            );
-          },
-          icon: Icon(
-            Icons.person,
-            color: isDarkMode ? MyColors.light : MyColors.dark,
-          )),
-      actions: [
-        IconButton(
-          // iconSize: 100.0,
-          icon: Icon(
-            Icons.settings,
-            color: isDarkMode ? MyColors.light : MyColors.dark,
-          ),
-          onPressed: () {
-            if (!areLessonsLoaded()) {
-              return;
-            }
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()));
-          },
-        )
-      ],
-      elevation: 5.0,
-      flexibleSpace: Container(
-        // height: screenHeight * 0.266,
-
-        height: 300.0,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: colors,
-          ),
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              left: 0.1,
-              bottom: 0.1,
-              child: Text(
-                title,
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                  fontSize: 60.0,
-                  fontFamily: "Inter",
-                  color: isDarkMode ? MyColors.light : MyColors.dark,
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
 
   SliverAppBar _generateSliverAppBar() {
     List<Color> colors = [MyColors.primary, MyColors.brightestPrimary];
@@ -421,11 +250,11 @@ class _HomePageState extends State<HomePage> {
         if (states.contains(WidgetState.selected)) {
           // return TextStyle(fontSize: 20.0, color: MyColors.brightestPrimary);
           return TextStyle(
-              fontSize: 20.0,
+              fontSize: 19.0,
               color: isDarkMode ? MyColors.light : MyColors.darkestPrimary);
         }
         return TextStyle(
-            fontSize: 20.0,
+            fontSize: 19.0,
             color: isDarkMode ? MyColors.gray5 : MyColors.gray2);
       }),
       height: 150.0,
@@ -514,11 +343,9 @@ class _HomePageState extends State<HomePage> {
       if (_user != null &&
           lessons.keys.length == 4 &&
           lessonData.keys.length == 4) {
-        print("Retornando true (já tinha usuário e dados)");
         return true;
       }
-      print("Loading progress");
-      final EResult result = await getUserFromServer(); //TODO: tratar isso aqui
+      final EResult result = await getUserFromServer();
       if (result != EResult.ok) {
         if (mounted) {
           await result.createAlert(context, isDarkMode);
@@ -526,7 +353,6 @@ class _HomePageState extends State<HomePage> {
         if (result != EResult.serverUnreachable &&
             result != EResult.communicationError) {
           tryingToConnect = false;
-          print("Retornando false (não deu ok)");
           return false;
         }
       }
@@ -536,15 +362,13 @@ class _HomePageState extends State<HomePage> {
           if (mounted) {
             await EResult.noUser.createAlert(context, isDarkMode);
           }
-          print("Retornando false (sem user no local)");
           return false;
         }
         for (ESubject subject in ESubject.values) {
           _loadLessonData(subject);
           lessons[subject] = _user!.lessons;
-          // setState(() {});
         }
-        print("Retornando true");
+
         return true;
       }
     }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tcc/global/my_colors.dart';
 
 class MainMenuOption extends StatelessWidget {
   const MainMenuOption(this.style,
@@ -99,7 +98,6 @@ class MainMenuOption extends StatelessWidget {
         break;
       case 3:
       // Square button
-      //TODO: In some screens, it can cause a size overflow
         button = Container(
           width: MediaQuery.of(context).size.width * 0.4,
           height: MediaQuery.of(context).size.width * 0.4,

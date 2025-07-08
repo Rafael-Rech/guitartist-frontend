@@ -144,7 +144,7 @@ Future<EResult> update(User user) async {
   var bodyJson = json.encode(bodyMap);
 
   if (user.id == null) {
-    return EResult.noUserId; //TODO: Must go back to the login screen
+    return EResult.noUserId;
   }
   String token = await getTokenFromDataBase();
   if(token == ""){
@@ -182,7 +182,7 @@ Future<EResult> delete() async {
   User? user = await UserHelper.getUser();
 
   if (user == null) {
-    return EResult.noUser; //TODO: Must go back to the login screen
+    return EResult.noUser;
   }
 
   String? userId = user.id;
@@ -223,7 +223,7 @@ Future<EResult> changePassword(String password) async {
   User? user = await UserHelper.getUser();
 
   if (user == null) {
-    return EResult.noUser; //TODO: Must go back to the login screen
+    return EResult.noUser;
   }
 
   user.password = password;

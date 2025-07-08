@@ -2,12 +2,10 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
-import 'package:tcc/global/theme.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/user.dart';
 import 'package:tcc/service/user_service.dart';
 import 'package:tcc/view/components/my_horizontal_button.dart';
-import 'package:tcc/view/login_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -296,7 +294,7 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
 
-    user!.noteRepresentation = representation;
+    user.noteRepresentation = representation;
     final EResult response = await update(user);
 
     if (response == EResult.ok) {

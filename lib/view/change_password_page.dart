@@ -8,9 +8,7 @@ import 'package:tcc/model/user.dart';
 import 'package:tcc/service/user_service.dart';
 import 'package:tcc/view/account_page.dart';
 import 'package:tcc/view/components/my_horizontal_button.dart';
-import 'package:tcc/view/components/my_text_button.dart';
 import 'package:tcc/view/components/my_text_field.dart';
-import 'package:tcc/view/home_page.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -46,94 +44,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       _inputsToButtonDistance = 0.04 * screenHeight;
     }
 
-    late Widget body;
-
-    // if (changedPassword) {
-    //   body = Center(
-    //     child: Column(
-    //       crossAxisAlignment: CrossAxisAlignment.center,
-    //       mainAxisAlignment: MainAxisAlignment.center,
-    //       children: [
-    //         Text(
-    //           "Senha alterada com sucesso!",
-    //           style: TextStyle(fontSize: 28.0),
-    //         ),
-    //         const SizedBox(height: 15.0),
-    //         MyTextButton(
-    //             onPressed: () {
-    //               Navigator.pushAndRemoveUntil(
-    //                   context,
-    //                   MaterialPageRoute(builder: (context) => HomePage()),
-    //                   (Route<dynamic> route) => false);
-    //             },
-    //             text: "Voltar ao início")
-    //       ],
-    //     ),
-    //   );
-    // } else {
-    //   body = Center(
-    //     child: SingleChildScrollView(
-    //       child: Column(
-    //         crossAxisAlignment: CrossAxisAlignment.center,
-    //         mainAxisAlignment: MainAxisAlignment.center,
-    //         children: [
-    //           MyTextField(
-    //             controller: passwordController,
-    //             errorText: passwordErrorText,
-    //             labelText: "Nova Senha",
-    //             obscureText: true,
-    //             sidePadding: 15.0,
-    //           ),
-    //           SizedBox(
-    //             height: 15.0,
-    //           ),
-    //           MyTextButton(
-    //             text: "Alterar",
-    //             fontSize: 22.0,
-    //             borderWidth: 2.0,
-    //             borderColor: MyColors.main6,
-    //             textColor: MyColors.neutral7,
-    //             onPressed: () async {
-    //               if (validate(passwordController.text)) {
-    //                 setState(() {
-    //                   passwordErrorText = null;
-    //                 });
-    //                 await showDialog(
-    //                     context: context,
-    //                     builder: (context) => Center(
-    //                           child: CircularProgressIndicator(
-    //                             color: MyColors.primary,
-    //                           ),
-    //                         ),
-    //                     barrierDismissible: false);
-    //                 final result =
-    //                     await changePassword(passwordController.text);
-    //                 if (mounted) {
-    //                   Navigator.pop(context);
-    //                 }
-    //                 if (result == EResult.ok) {
-    //                   setState(() {
-    //                     changedPassword = true;
-    //                   });
-    //                 } else {
-    //                   if (mounted) {
-    //                     result.createAlert(context, isDarkMode);
-    //                   }
-    //                 }
-    //               } else {
-    //                 setState(() {
-    //                   passwordErrorText =
-    //                       "A senha deve conter entre 8 e 63 caracteres!";
-    //                 });
-    //               }
-    //             },
-    //           )
-    //         ],
-    //       ),
-    //     ),
-    //   );
-    // }
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(0.2 * screenHeight),
@@ -144,7 +54,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         child: SingleChildScrollView(
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 5.0),
-            height: 0.45 * screenHeight,
+            height: 0.5 * screenHeight,
             width: 0.8744 * screenWidth,
             decoration: BoxDecoration(
               color: MyColors.primary,
@@ -175,6 +85,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   obscureText: !oldPasswordVisible,
                   controller: oldPasswordController,
                   sidePadding: 0.04 * screenWidth,
+                  textColor: isDarkMode? MyColors.light : MyColors.dark,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15.0),
                       borderSide: BorderSide(
@@ -205,6 +116,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   obscureText: !passwordVisible,
                   controller: passwordController,
                   errorText: passwordErrorText,
+                  textColor: isDarkMode? MyColors.light : MyColors.dark,
                   errorStyle: TextStyle(
                     fontStyle: FontStyle.italic,
                     color: MyColors.light,
@@ -404,7 +316,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   "Ok",
                   style: TextStyle(
                     color:
-                        isDarkMode ? MyColors.brightPrimary : MyColors.primary,
+                        isDarkMode ? MyColors.light : MyColors.primary,
                     fontSize: 22.0,
                   ),
                 ),

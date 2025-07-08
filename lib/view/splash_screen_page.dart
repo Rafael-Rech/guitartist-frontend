@@ -1,7 +1,6 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqlite_api.dart';
-import 'package:tcc/global/alerts.dart';
 import 'package:tcc/global/e_result.dart';
 import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/token_helper.dart';
@@ -64,7 +63,8 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
   }
 
   List<Widget> generateBottomSheetContent() {
-    final double buttonHeight = 0.1 * screenHeight;
+    final double buttonHeight = 0.115 * screenHeight;
+    // final double buttonHeight = 0.1 * screenHeight;
     final double buttonWidth = 0.94 * screenWidth;
     final double buttonTextFontSize = 50.0;
 
@@ -109,61 +109,6 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
       SizedBox(
         height: screenHeight * 0.06,
       ),
-
-      // SizedBox(
-      //   width: MediaQuery.of(context).size.width * 0.9,
-      //   child: TextButton(
-      //     onPressed: () {
-      //       Navigator.of(context).push(_createAnimatedRoute(LoginPage(false)));
-      //     },
-      //     style: ButtonStyle(
-      //       shape: WidgetStateProperty.all(
-      //         RoundedRectangleBorder(
-      //           side: const BorderSide(
-      //             color: Color.fromARGB(255, 217, 68, 99),
-      //             width: 1,
-      //           ),
-      //           borderRadius: BorderRadius.circular(5),
-      //         ),
-      //       ),
-      //     ),
-      //     child: const Text(
-      //       "LOGIN",
-      //       style: TextStyle(
-      //         fontSize: 20,
-      //         color: Colors.grey,
-      //       ),
-      //     ),
-      //   ),
-      // ),
-      // const SizedBox(height: 5),
-      // SizedBox(
-      //   width: MediaQuery.of(context).size.width * 0.9,
-      //   child: TextButton(
-      //     onPressed: () {
-      //       Navigator.of(context).push(_createAnimatedRoute(LoginPage(true)));
-      //     },
-      //     style: ButtonStyle(
-      //       shape: WidgetStateProperty.all(
-      //         RoundedRectangleBorder(
-      //           side: const BorderSide(
-      //             color: Color.fromARGB(255, 217, 68, 99),
-      //             width: 1,
-      //           ),
-      //           borderRadius: BorderRadius.circular(5),
-      //         ),
-      //       ),
-      //     ),
-      //     child: const Text(
-      //       "REGISTRO",
-      //       style: TextStyle(
-      //         fontSize: 20,
-      //         color: Colors.grey,
-      //       ),
-      //     ),
-      //   ),
-      // ),
-      // const SizedBox(height: 20)
     ];
   }
 
@@ -204,29 +149,6 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
           i = 2;
         } else {
           if (mounted) {
-            // await alert(
-            //     context,
-            //     "Não foi possível alcançar o servidor",
-            //     "Verifique sua conexão ou tente novamente mais tarde.",
-            //     [
-            //       TextButton(
-            //         onPressed: () {
-            //           i--;
-            //           Navigator.of(context).pop();
-            //         },
-            //         child: Text(
-            //           "Tentar novamente",
-            //           style: TextStyle(
-            //               color: darkMode
-            //                   ? MyColors.brightPrimary
-            //                   : MyColors.primary,
-            //               fontSize: 22.0),
-            //         ),
-            //       )
-            //     ],
-            //     darkMode,
-            //     actionsAlignment: MainAxisAlignment.center,
-            //     dismissible: false);
             await result.createAlert(context, darkMode,
                 actions: [
                   TextButton(
@@ -238,7 +160,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
                       "Tentar novamente",
                       style: TextStyle(
                           color: darkMode
-                              ? MyColors.brightPrimary
+                              ? MyColors.light
                               : MyColors.primary,
                           fontSize: 22.0),
                     ),
@@ -256,7 +178,6 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
         TokenHelper().initdb();
       }
     }
-    //TODO: Tratar se continuar dando erro
   }
 
   Route _createAnimatedRoute(Widget page) {

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'dart:async';
 
 import 'package:just_audio/just_audio.dart';
@@ -22,7 +21,7 @@ class _MetronomePageState extends State<MetronomePage> {
   bool playing = false;
   Icon buttonIcon = const Icon(Icons.play_arrow);
   Random rng = Random();
-  Timer? metronomeTimer;
+  Timer? metronomeTimer, _bpmButtonsTimer;
   FocusNode focusNode = FocusNode();
   final justAudioPlayer = AudioPlayer();
 
@@ -38,50 +37,41 @@ class _MetronomePageState extends State<MetronomePage> {
   final String errorMessage = "Insira um valor entre 40 e 220.";
   String? error;
 
-  // final List<String> measures = [
-  //   "4/4",
-  //   "3/4",
-  //   "2/4",
-  //   "6/8",
-  // ];
-  // int measureIndex = 0;
-  // ValueNotifier<bool> isDialOpen = ValueNotifier(false);
-
   @override
   void initState() {
     super.initState();
-    controller.addListener(() {
-      // if (controller.text == "") {
-      //   error = errorMessage;
-      //   return;
-      // }
+    // controller.addListener(() {
+    //   // if (controller.text == "") {
+    //   //   error = errorMessage;
+    //   //   return;
+    //   // }
 
-      // int? bpm = int.tryParse(controller.text);
-      // if (bpm == null) {
-      //   setState(() {
-      //     controller.text = "$beatsPerMinute";
-      //   });
-      //   bpm = beatsPerMinute;
-      // } else if (bpm < 40) {
-      //   setState(() {
-      //     controller.text = "40";
-      //   });
-      //   bpm = 40;
-      // } else if (bpm > 220) {
-      //   setState(() {
-      //     controller.text = "220";
-      //   });
-      //   bpm = 220;
-      // }
+    //   // int? bpm = int.tryParse(controller.text);
+    //   // if (bpm == null) {
+    //   //   setState(() {
+    //   //     controller.text = "$beatsPerMinute";
+    //   //   });
+    //   //   bpm = beatsPerMinute;
+    //   // } else if (bpm < 40) {
+    //   //   setState(() {
+    //   //     controller.text = "40";
+    //   //   });
+    //   //   bpm = 40;
+    //   // } else if (bpm > 220) {
+    //   //   setState(() {
+    //   //     controller.text = "220";
+    //   //   });
+    //   //   bpm = 220;
+    //   // }
 
-      // setState(() {
-      //   error = null;
-      //   beatsPerMinute = bpm!;
-      //   if (metronomeTimer != null && metronomeTimer!.isActive) {
-      //     updateTimer();
-      //   }
-      // });
-    });
+    //   // setState(() {
+    //   //   error = null;
+    //   //   beatsPerMinute = bpm!;
+    //   //   if (metronomeTimer != null && metronomeTimer!.isActive) {
+    //   //     updateTimer();
+    //   //   }
+    //   // });
+    // });
   }
 
   @override
@@ -205,11 +195,13 @@ class _MetronomePageState extends State<MetronomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 SizedBox(
-                  width: 0.4 * screenWidth,
+                  width: 0.35 * screenWidth,
                   child: MyTextField(
                     onSubmitted: (p0) {
                       _handleTextFieldInput();
                     },
+                    // textColor: isDarkMode ? MyColors.light : MyColors.dark,
+                    textColor: MyColors.dark,
                     border: InputBorder.none,
                     errorText: error,
                     keyboardType: TextInputType.number,
@@ -217,42 +209,86 @@ class _MetronomePageState extends State<MetronomePage> {
                     fontSize: 34,
                     focusNode: focusNode,
                     suffixText: " bpm",
-                    suffixStyle:
-                        TextStyle(fontSize: 26.0, fontFamily: "Archivo Narrow"),
+                    suffixStyle: TextStyle(
+                      fontSize: 26.0,
+                      fontFamily: "Archivo Narrow",
+                      color: MyColors.gray1,
+                      // color: isDarkMode ? MyColors.gray5 : MyColors.gray1,
+                    ),
                     // contentPadding: EdgeInsets.zero,
                     textAlign: TextAlign.center,
                   ),
                 ),
                 const SizedBox(width: 5),
-                IconButton(
-                  onPressed: () {
-                    final int bpm = int.parse(controller.text);
-                    if (bpm < 220 && beatsPerMinute < 220) {
-                      setState(() {
-                        controller.text = (bpm + 1).toString();
-                        beatsPerMinute = bpm + 1;
-                      });
-                      updateTimer();
+                // IconButton(
+                //   onPressed: () {
+                //     final int bpm = int.parse(controller.text);
+                //     if (bpm < 220 && beatsPerMinute < 220) {
+                //       setState(() {
+                //         controller.text = (bpm + 1).toString();
+                //         beatsPerMinute = bpm + 1;
+                //       });
+                //       updateTimer();
+                //     }
+                //   },
+                //   icon: Icon(
+                //     Icons.arrow_drop_up,
+                //     color: MyColors.gray1,
+                //     size: 50.0,
+                //   ),
+                // ),
+                // IconButton(
+                //   onPressed: () {
+                //     final int bpm = int.parse(controller.text);
+                //     if (bpm > 40) {
+                //       setState(() {
+                //         controller.text = (bpm - 1).toString();
+                //         beatsPerMinute = bpm - 1;
+                //       });
+                //       updateTimer();
+                //     }
+                //   },
+                //   icon: Icon(
+                //     Icons.arrow_drop_down,
+                //     color: MyColors.gray1,
+                //     size: 50.0,
+                //   ),
+                // ),
+                GestureDetector(
+                  onTap: _buttonIncrementFunction,
+                  onLongPressStart: (details) {
+                    if (_bpmButtonsTimer != null) {
+                      return;
                     }
+                    _bpmButtonsTimer = Timer.periodic(
+                      Duration(milliseconds: 100),
+                      (timer) {
+                        _buttonIncrementFunction();
+                      },
+                    );
                   },
-                  icon: Icon(
+                  onLongPressEnd: _stopIncrementingOrDecrementing,
+                  child: Icon(
                     Icons.arrow_drop_up,
                     color: MyColors.gray1,
                     size: 50.0,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    final int bpm = int.parse(controller.text);
-                    if (bpm > 40) {
-                      setState(() {
-                        controller.text = (bpm - 1).toString();
-                        beatsPerMinute = bpm - 1;
-                      });
-                      updateTimer();
+                GestureDetector(
+                  onTap: _buttonDecrementFunction,
+                  onLongPressStart: (details) {
+                    if (_bpmButtonsTimer != null) {
+                      return;
                     }
+                    _bpmButtonsTimer = Timer.periodic(
+                      Duration(milliseconds: 100),
+                      (timer) {
+                        _buttonDecrementFunction();
+                      },
+                    );
                   },
-                  icon: Icon(
+                  onLongPressEnd: _stopIncrementingOrDecrementing,
+                  child: Icon(
                     Icons.arrow_drop_down,
                     color: MyColors.gray1,
                     size: 50.0,
@@ -281,6 +317,36 @@ class _MetronomePageState extends State<MetronomePage> {
         ],
       ),
     );
+  }
+
+  void _buttonIncrementFunction() {
+    final int bpm = int.parse(controller.text);
+    if (bpm < 220 && beatsPerMinute < 220) {
+      setState(() {
+        controller.text = (bpm + 1).toString();
+        beatsPerMinute = bpm + 1;
+      });
+      updateTimer();
+    }
+  }
+
+  void _buttonDecrementFunction() {
+    final int bpm = int.parse(controller.text);
+    if (bpm > 40 && beatsPerMinute > 40) {
+      setState(() {
+        controller.text = (bpm - 1).toString();
+        beatsPerMinute = bpm - 1;
+      });
+      updateTimer();
+    }
+  }
+
+  void _stopIncrementingOrDecrementing(LongPressEndDetails details) {
+    if (_bpmButtonsTimer == null || !_bpmButtonsTimer!.isActive) {
+      return;
+    }
+    _bpmButtonsTimer?.cancel();
+    _bpmButtonsTimer = null;
   }
 
   Widget _generateBeatsPerMeasureController() {
@@ -312,6 +378,8 @@ class _MetronomePageState extends State<MetronomePage> {
                 fontFamily: "Roboto",
               ),
               // padding: EdgeInsets.all(5),
+              underline: Container(),
+              padding: EdgeInsets.zero,
               borderRadius: BorderRadius.circular(10),
               menuMaxHeight: screenHeight / 3,
               alignment: Alignment.center,

@@ -1,28 +1,15 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flutter_sound.dart';
-import 'package:flutter_sound/public/flutter_sound_player.dart';
 import 'package:tcc/global/alerts.dart';
 import 'package:tcc/global/my_colors.dart';
-import 'package:tcc/helper/lesson_helper.dart';
-import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/Enum/e_lesson_type.dart';
-import 'package:tcc/model/lesson.dart';
-import 'package:tcc/model/user.dart';
-import 'package:tcc/music_theory_components/exercise.dart';
 import 'package:tcc/music_theory_components/listen_exercise.dart';
-import 'package:tcc/music_theory_components/quiz_exercise.dart';
-import 'package:tcc/service/user_service.dart';
 import 'package:tcc/view/components/answer_option.dart';
-import 'package:tcc/view/components/my_text_button.dart';
 import 'package:tcc/view/exercise_page.dart';
 import 'package:tcc/view/home_page.dart';
-import 'package:tcc/view/quiz_exercise_page.dart';
-import 'package:tcc/view/settings_page.dart';
 
 import 'package:just_audio/just_audio.dart';
 
@@ -161,6 +148,8 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
                                       if (!playingAudio) {
                                         await playAudio(
                                             exercise.playAudiosAtSameTime);
+                                      } else {
+                                        print("Ainda tá tocando");
                                       }
                                     },
                                     onTapDown: (details) {
@@ -241,15 +230,110 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
 
   Future<void> playAudio(bool playAudiosAtSameTime) async {
     playingAudio = true;
-    final Duration delay = (playAudiosAtSameTime)
-        ? Duration(milliseconds: 750)
-        : Duration(seconds: 2);
-    for (int i = 0; i < exercise.audioPaths.length; i++) {
-      Future.delayed(delay * i, () async {
-        await players[i].setAsset(exercise.audioPaths[i]);
-        await players[i].play();
+
+    // final Duration delay = (playAudiosAtSameTime)
+    //     ? Duration(milliseconds: 750)
+    //     : Duration(seconds: 2);
+    // for (int i = 0; i < exercise.audioPaths.length; i++) {
+    //   Future.delayed(delay * i, () async {
+    //     await players[i].setAsset(exercise.audioPaths[i]);
+    //     await players[i].play();
+    //   });
+    // }
+
+    // if(playAudiosAtSameTime){
+    //   await playAudio(false);
+    //   print("Esperou");
+    //   await Future.delayed(Duration(seconds: 1));
+    // }
+
+    // final Duration delay = (playAudiosAtSameTime)
+    //     ? Duration(milliseconds: 600)
+    //     : Duration(seconds: 1, milliseconds: 500);
+    // for (int i = 0; i < exercise.audioPaths.length; i++) {
+    //   Future.delayed(delay * i, () async {
+    //     await players[i].setAsset(exercise.audioPaths[i]);
+    //     await players[i].play();
+    //   });
+    // }
+
+    Duration delay = Duration(seconds: 1, milliseconds: 500);
+    final int numberOfAudios = exercise.audioPaths.length;
+    for (int i = 0; i < numberOfAudios; i++) {
+      if (i < numberOfAudios - 1) {
+        Future.delayed(delay * i, () async {
+          await players[i].setAsset(exercise.audioPaths[i]);
+          await players[i].play();
+        });
+      } else {
+        await Future.delayed(delay * i, () async {
+          await players[i].setAsset(exercise.audioPaths[i]);
+          await players[i].play();
+        });
+      }
+    }
+
+    if (playAudiosAtSameTime) {
+      delay = Duration(milliseconds: 350);
+      Future.delayed(Duration(seconds: 1, milliseconds: 600), () async {
+        for (int i = 0; i < exercise.audioPaths.length; i++) {
+          Future.delayed(delay * i, () async {
+            await players[i].setAsset(exercise.audioPaths[i]);
+            await players[i].play();
+          });
+        }
       });
     }
+
+    // if (playAudiosAtSameTime && players[numberOfAudios - 1].duration != null) {
+    //   Duration waitTime = players[numberOfAudios - 1].duration! +
+    //       Duration(seconds: 1) +
+    //       delay * numberOfAudios;
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("Duração: ${waitTime.inSeconds} s");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   await Future.delayed(
+    //       players[numberOfAudios].duration! +
+    //           Duration(seconds: 1) +
+    //           delay * numberOfAudios, () async {
+    //     delay = Duration(milliseconds: 600);
+
+    //     for (int i = 0; i < exercise.audioPaths.length; i++) {
+    //       Future.delayed(delay * i, () async {
+    //         await players[i].setAsset(exercise.audioPaths[i]);
+    //         await players[i].play();
+    //       });
+    //     }
+    //   });
+    // } else {
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print(
+    //       "Deu ruim: PlayAtSameTime = $playAudiosAtSameTime, Duração = ${players[numberOfAudios - 1].duration}");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    // }
+
     playingAudio = false;
   }
 

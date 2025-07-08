@@ -19,6 +19,8 @@ class MyTextFormField extends StatefulWidget {
     this.fillColor,
     this.fill,
     this.labelColor,
+    this.isDarkMode,
+    this.textColor,
   });
 
   final String? labelText;
@@ -33,7 +35,9 @@ class MyTextFormField extends StatefulWidget {
   final TextInputType? keyboardType;
   final Color? fillColor;
   final bool? fill;
+  final bool? isDarkMode;
   final Color? labelColor;
+  final Color? textColor;
 
   @override
   State<MyTextFormField> createState() => _MyTextFormFieldState();
@@ -58,6 +62,9 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
       suffixIcon = IconButton(
         icon: Icon(
           hideText ? Icons.visibility_off : Icons.visibility,
+          color: widget.isDarkMode != null && widget.isDarkMode!
+              ? MyColors.light
+              : MyColors.dark,
         ),
         onPressed: () {
           setState(() {
@@ -73,7 +80,7 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
       decoration: InputDecoration(
         filled: widget.fill,
         labelText: widget.labelText,
-        labelStyle: TextStyle(color: widget.labelColor?? MyColors.gray1),
+        labelStyle: TextStyle(color: widget.labelColor ?? MyColors.gray1),
         enabledBorder: widget.border,
         // focusColor: MyColors.secondary5,
         suffixIcon: suffixIcon,
@@ -82,9 +89,10 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
         errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5),
             borderSide: BorderSide(
-                color: AdaptiveTheme.of(context).theme.colorScheme.error, width: 2.0)),
+                color: AdaptiveTheme.of(context).theme.colorScheme.error,
+                width: 2.0)),
       ),
-      style: TextStyle(fontFamily: widget.fontFamily),
+      style: TextStyle(fontFamily: widget.fontFamily, color: widget.textColor),
       obscureText: hideText,
       focusNode: widget.focusNode,
       validator: widget.validator,

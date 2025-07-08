@@ -1,12 +1,10 @@
 import 'package:tcc/music_theory_components/exercise.dart';
 import 'package:tcc/music_theory_components/interval.dart';
 import 'package:tcc/music_theory_components/note.dart';
-import 'package:tcc/music_theory_components/option.dart';
 
 abstract class ExerciseBuilder {
   Exercise buildExercise(List<int> components, List<int> highlightedComponents);
 
-  List<Option> _generateOptions(Option correctOption, String property);
 
   static String generateNoteOptionText(List<Note> notes, int nameOption) {
     String optionText = "";

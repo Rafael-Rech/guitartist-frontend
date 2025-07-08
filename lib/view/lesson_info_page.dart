@@ -212,20 +212,20 @@ class _LessonInfoPageState extends State<LessonInfoPage> {
     switch (widget.subject) {
       case ESubject.note:
         exerciseBuilder = NoteExerciseBuilder(
-            lessonType, widget.lessonId, noteRepresentation);
+            lessonType, noteRepresentation);
         break;
       case ESubject.interval:
         exerciseBuilder = IntervalExerciseBuilder(
-            lessonType, widget.lessonId, noteRepresentation);
+            lessonType, noteRepresentation);
         break;
 
       case ESubject.scale:
         exerciseBuilder = ScaleExerciseBuilder(
-            lessonType, widget.lessonId, noteRepresentation);
+            lessonType, noteRepresentation);
         break;
       case ESubject.chord:
         exerciseBuilder = ChordExerciseBuilder(
-            lessonType, widget.lessonId, noteRepresentation);
+            lessonType, noteRepresentation);
         break;
     }
 

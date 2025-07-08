@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tcc/global/my_colors.dart';
 
 class MyTextButton extends StatefulWidget {
   const MyTextButton({

@@ -73,7 +73,8 @@ class _LoginPageState extends State<LoginPage> {
     columnChildren.addAll([
       SizedBox(height: 0.06 * screenHeight),
       MyHorizontalButton(
-        height: 0.08 * screenHeight,
+        height: 0.09 * screenHeight,
+        // height: 0.08 * screenHeight,
         mainColor: MyColors.darkPrimary,
         secondaryColor: MyColors.brightPrimary,
         onPressed: mainButtonFunction,
@@ -126,16 +127,6 @@ class _LoginPageState extends State<LoginPage> {
                               width: 0.13 * screenWidth,
                             ),
                           ),
-                          // child: Stack(
-                          //   children: [
-                          //     Positioned(
-                          //       child: Image(
-                          //         image: AssetImage("assets/imgs/IconGuitartist.png"),
-                          //         width: 0.13 * screenWidth,
-                          //       ),
-                          //     )
-                          //   ],
-                          // ),
                         ),
                         SizedBox(height: 0.017 * screenHeight),
                         _formTitle(),
@@ -234,6 +225,8 @@ class _LoginPageState extends State<LoginPage> {
       fill: true,
       labelColor: isDarkMode ? MyColors.light : MyColors.gray1,
       obscureText: useObscureText ? !passwordVisible : null,
+      isDarkMode: isDarkMode,
+      textColor: isDarkMode? MyColors.light : MyColors.dark,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
         borderSide: BorderSide(
@@ -269,7 +262,7 @@ class _LoginPageState extends State<LoginPage> {
               ? "Já possui uma conta?"
               : "Não possui uma conta?",
           style: TextStyle(
-            fontSize: 20.0,
+            fontSize: 18.0,
             fontWeight: FontWeight.normal,
             fontFamily: "Roboto",
             color: isDarkMode? MyColors.light : MyColors.dark
@@ -287,7 +280,7 @@ class _LoginPageState extends State<LoginPage> {
             widget.isRegistering ? "Entrar" : "Registre-se",
             style: TextStyle(
               color: isDarkMode ? Color(0xFF3B8EED) : Color(0xFF0E4C94),
-              fontSize: 20.0,
+              fontSize: 18.0,
               fontFamily: "Roboto",
             ),
           ),
@@ -346,23 +339,6 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       if (mounted) {
         waitingForResponse = false;
-        // Navigator.of(context).pop();
-        // return showDialog<void>(
-        //   context: context,
-        //   builder: (context) {
-        //     return AlertDialog(
-        //       title: Text("Erro ao efetuar login"),
-        //       content: Text(loginResult),
-        //       actions: [
-        //         TextButton(
-        //             onPressed: () {
-        //               Navigator.of(context).pop();
-        //             },
-        //             child: Text("Ok"))
-        //       ],
-        //     );
-        //   },
-        // );
         Navigator.pop(context);
         await loginResult.createAlert(context, isDarkMode);
       }
@@ -370,11 +346,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> registerFunction() async {
-    print("Register");
     if (waitingForResponse || !_formKey.currentState!.validate()) {
       return;
     }
-    print("a");
     final String username = usernameController.text;
     final String email = emailController.text;
     final String password = passwordController.text;

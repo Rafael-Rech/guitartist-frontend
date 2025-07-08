@@ -13,14 +13,13 @@ import 'package:tcc/music_theory_components/quiz_exercise.dart';
 import 'package:tcc/music_theory_components/scale.dart';
 
 class ScaleExerciseBuilder implements ExerciseBuilder {
-  ScaleExerciseBuilder(this._type, this._lessonId, this._nameOption) {
+  ScaleExerciseBuilder(this._type, this._nameOption) {
     _nameOption =
         (_nameOption != 0 && _nameOption != 1) ? _rng.nextInt(2) : _nameOption;
   }
 
   final Random _rng = Random();
   final ELessonType _type;
-  String _lessonId;
   int _nameOption;
   List<int> scalesIndexes = [],
       highlightedScalesIndexes = [],
@@ -40,7 +39,6 @@ class ScaleExerciseBuilder implements ExerciseBuilder {
         .scales[_rng.nextInt(MusicTheoryComponents.scales.length)];
   }
 
-  @override
   List<Option> _generateOptions(Option correctOption, String property) {
     List<Option> options = [correctOption];
 

@@ -15,14 +15,13 @@ import 'package:tcc/music_theory_components/quiz_exercise.dart';
 import 'package:tcc/music_theory_components/shape.dart';
 
 class ChordExerciseBuilder implements ExerciseBuilder {
-  ChordExerciseBuilder(this._type, this._lessonId, this._nameOption) {
+  ChordExerciseBuilder(this._type, this._nameOption) {
     _nameOption =
         (_nameOption != 0 && _nameOption != 1) ? _rng.nextInt(2) : _nameOption;
   }
 
   final Random _rng = Random();
   final ELessonType _type;
-  String _lessonId;
   int _nameOption;
   List<int> chordIndexes = [],
       highlightedChordIndexes = [],
@@ -48,11 +47,10 @@ class ChordExerciseBuilder implements ExerciseBuilder {
         throw Exception("Base note was not provided!");
       }
       bool insert = true;
-      if(property == "intervals" && accumulatedIntervals == null){
+      if(property == "intervals"){
         insert = false;
-        print("Accumulated intervals is null (generating options)");
       } else if(property == "intervals"){
-        intervalsText = ExerciseBuilder.generateIntervalOptionText(accumulatedIntervals!);
+        intervalsText = ExerciseBuilder.generateIntervalOptionText(accumulatedIntervals);
       }
       for (Option option in options) {
         if (property == "name" && option.text == newChord.name) {
@@ -188,7 +186,6 @@ class ChordExerciseBuilder implements ExerciseBuilder {
     for(int i = 1; i < chord.intervals.length; i++){
       Interval? accumulatedInterval = chord.intervals[i].addInterval(intervalsFromRootNote.last);
       if(accumulatedInterval == null){
-        print("Accumulated interval is null");
         return null;
       }
       intervalsFromRootNote.add(accumulatedInterval);
@@ -200,9 +197,6 @@ class ChordExerciseBuilder implements ExerciseBuilder {
     String question = "Quais são os intervalos, a partir da nota fundamental, que formam um Acorde ${chord.name}?";
     // List<Interval>? intervalsFromRootNote = accumulateIntervals(chord);
     List<Interval> intervalsFromRootNote = chord.accumulatedIntervals;
-    if(intervalsFromRootNote == null){
-      return _guessNotesExercise(chord);
-    }
     Option correctOption = Option(true, ExerciseBuilder.generateIntervalOptionText(intervalsFromRootNote));
     List<Option> options = _generateOptions(correctOption, "intervals");
     return QuizExercise(question, options);

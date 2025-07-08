@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:isolate';
 import 'dart:math';
 import 'package:fftea/util.dart';
@@ -23,7 +22,6 @@ class _TunerPageState extends State<TunerPage> {
   Color micIconColor = Colors.black;
   ReceivePort receivePort = ReceivePort();
   late SendPort sendPort;
-  final Completer _isolateReady = Completer();
   AudioRecorder audioRecorder = AudioRecorder();
   Random rng = Random();
   final samplesPerSecond = 44100;
@@ -69,24 +67,6 @@ class _TunerPageState extends State<TunerPage> {
     );
   }
 
-  static void isolateCode(Map data) {
-    final SendPort sendPort = data["sendPort"];
-    final token = data["token"];
-    BackgroundIsolateBinaryMessenger.ensureInitialized(token);
-    final receivePort = ReceivePort();
-    sendPort.send(receivePort.sendPort);
-
-    receivePort.listen((dynamic message) async {
-      if (message is bool) {
-        if (message) {
-          sendPort.send(Random().nextInt(200));
-        } else {
-          sendPort.send(-1);
-        }
-      } else if (message is String && message == "ShutDown") {
-      }
-    });
-  }
 
   void captureAudio() async {
     PermissionStatus status = await Permission.microphone.request();

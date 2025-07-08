@@ -71,6 +71,7 @@ class _MyTextFieldState extends State<MyTextField> {
       suffixIcon = IconButton(
         icon: Icon(
           hideText ? Icons.visibility_off : Icons.visibility,
+          color: (widget.isDarkMode != null && widget.isDarkMode!)? MyColors.light : MyColors.dark,
         ),
         onPressed: () {
           setState(() {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tcc/global/my_colors.dart';
 
 class LessonHelpPage extends StatelessWidget {
   const LessonHelpPage({super.key, required this.lessonId});

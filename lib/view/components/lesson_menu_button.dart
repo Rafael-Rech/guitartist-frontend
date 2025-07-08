@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -9,20 +8,8 @@ import 'package:tcc/global/my_colors.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/Enum/e_subject.dart';
 import 'package:tcc/model/user.dart';
-import 'package:tcc/music_theory_components/exercise.dart';
-import 'package:tcc/music_theory_components/exercise_builders/chord_exercise_builder.dart';
-import 'package:tcc/music_theory_components/exercise_builders/exercise_builder.dart';
-import 'package:tcc/music_theory_components/exercise_builders/interval_exercise_builder.dart';
-import 'package:tcc/music_theory_components/exercise_builders/note_exercise_builder.dart';
-import 'package:tcc/music_theory_components/exercise_builders/scale_exercise_builder.dart';
-import 'package:tcc/music_theory_components/music_theory_components.dart';
-import 'package:tcc/view/lesson_help_page.dart';
 import 'package:tcc/view/lesson_info_page.dart';
-import 'package:tcc/view/listening_exercise_page.dart';
-import 'package:tcc/view/login_page.dart';
-import 'package:tcc/view/quiz_exercise_page.dart';
 
-import '../../model/Enum/e_lesson_type.dart';
 
 class LessonMenuButton extends StatefulWidget {
   const LessonMenuButton({
@@ -277,64 +264,11 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
     }
   }
 
-  Exercise _generateExercise(ELessonType lessonType, int noteRepresentation) {
-    late final ExerciseBuilder exerciseBuilder;
-
-    switch (widget.subject) {
-      case ESubject.note:
-        exerciseBuilder = NoteExerciseBuilder(
-            lessonType, widget.lessonId, noteRepresentation);
-        break;
-      case ESubject.interval:
-        exerciseBuilder = IntervalExerciseBuilder(
-            lessonType, widget.lessonId, noteRepresentation);
-        break;
-
-      case ESubject.scale:
-        exerciseBuilder = ScaleExerciseBuilder(
-            lessonType, widget.lessonId, noteRepresentation);
-        break;
-      case ESubject.chord:
-        exerciseBuilder = ChordExerciseBuilder(
-            lessonType, widget.lessonId, noteRepresentation);
-        break;
-    }
-
-    return exerciseBuilder.buildExercise(
-        widget.components, widget.highlightedComponents);
-  }
-
-  void showErrorAlert({String? title, String? content}) {
-    title ??= "ERRO AO GERAR LIÇÃO";
-    content ??=
-        "Ocorreu um erro ao gerar a lição. Você será redirecionado para a tela de login.";
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title!),
-        content: Text(content!),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage(false)),
-                  (route) => false);
-            },
-            child: Text("Ok"),
-          )
-        ],
-      ),
-    );
-  }
-
   Future<int> getNoteRepresentation() async {
     User? user = await UserHelper.getUser();
 
     if (user == null) {
       if (mounted) {
-        // showErrorAlert();
         await EResult.noUser.createAlert(context, isDarkMode);
       }
       return -1;
@@ -344,18 +278,4 @@ class _LessonMenuButtonState extends State<LessonMenuButton> {
     return noteRepresentation;
   }
 
-  Future<List<Exercise>> _generateLesson(ELessonType type) async {
-    final int noteRepresentation = await getNoteRepresentation();
-    if (noteRepresentation == -1) {
-      return [];
-    }
-
-    List<Exercise> exercises = [];
-
-    for (int i = 0; i < numberOfExercisesPerLesson; i++) {
-      exercises.add(_generateExercise(type, noteRepresentation));
-    }
-
-    return exercises;
-  }
 }

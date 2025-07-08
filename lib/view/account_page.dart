@@ -1,5 +1,4 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'package:analog_clock/analog_clock.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -10,15 +9,9 @@ import 'package:tcc/helper/token_helper.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/lesson.dart';
 import 'package:tcc/model/user.dart';
-import 'package:tcc/music_theory_components/lesson_data/chord_lessons.dart';
-import 'package:tcc/music_theory_components/lesson_data/interval_lessons.dart';
-import 'package:tcc/music_theory_components/lesson_data/lesson_data.dart';
-import 'package:tcc/music_theory_components/lesson_data/note_lessons.dart';
-import 'package:tcc/music_theory_components/lesson_data/scale_lessons.dart';
 import 'package:tcc/service/user_service.dart';
 import 'package:tcc/view/change_password_page.dart';
 import 'package:tcc/view/components/my_horizontal_button.dart';
-import 'package:tcc/view/components/my_text_button.dart';
 import 'package:tcc/view/components/my_text_field.dart';
 import 'package:tcc/view/splash_screen_page.dart';
 
@@ -60,6 +53,8 @@ class _AccountPageState extends State<AccountPage> {
 
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
+
+    final double buttonHeight = 0.11 * screenHeight;
 
     return GestureDetector(
       onTap: () async {
@@ -198,7 +193,7 @@ class _AccountPageState extends State<AccountPage> {
                             builder: (context) => const ChangePasswordPage()));
                   },
                   text: "Alterar senha",
-                  height: 0.1 * screenHeight,
+                  height: buttonHeight,
                   width: 0.9395 * screenWidth,
                   useGradient: true,
                   mainColor: MyColors.darkPrimary,
@@ -212,28 +207,6 @@ class _AccountPageState extends State<AccountPage> {
                 ),
 
                 MyHorizontalButton(
-                  // onPressed: () async => await showDialog(
-                  //   context: context,
-                  //   builder: (context) => AlertDialog(
-                  //     title: const Text("Você tem certeza que deseja sair?"),
-                  //     actions: [
-                  //       TextButton(
-                  //         onPressed: () => Navigator.pop(context),
-                  //         child: Text(
-                  //           "Cancelar",
-                  //           style: TextStyle(color: MyColors.neutral7),
-                  //         ),
-                  //       ),
-                  //       TextButton(
-                  //         onPressed: logout,
-                  //         child: Text(
-                  //           "Sim",
-                  //           style: TextStyle(color: Colors.red),
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
                   onPressed: () async {
                     await alert(
                       context,
@@ -271,7 +244,7 @@ class _AccountPageState extends State<AccountPage> {
                     );
                   },
                   text: "Sair",
-                  height: 0.1 * screenHeight,
+                  height: buttonHeight,
                   width: 0.9395 * screenWidth,
                   useGradient: true,
                   mainColor: MyColors.darkPrimary,
@@ -285,30 +258,6 @@ class _AccountPageState extends State<AccountPage> {
                 ),
 
                 MyHorizontalButton(
-                  // onPressed: () async => await showDialog(
-                  //   context: context,
-                  //   builder: (context) => AlertDialog(
-                  //     title: const Text("Você tem certeza?"),
-                  //     content: Text(
-                  //         "Esta opção irá deletar a sua conta e todos os dados associados a ela. Não é possível recuperá-la. Você deseja continuar?"),
-                  //     actions: [
-                  //       TextButton(
-                  //         onPressed: () => Navigator.pop(context),
-                  //         child: Text(
-                  //           "Cancelar",
-                  //           style: TextStyle(color: MyColors.secondary7),
-                  //         ),
-                  //       ),
-                  //       TextButton(
-                  //         onPressed: deleteAccount,
-                  //         child: Text(
-                  //           "Sim",
-                  //           style: TextStyle(color: Colors.red),
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
                   onPressed: () async {
                     await alert(
                       context,
@@ -345,7 +294,7 @@ class _AccountPageState extends State<AccountPage> {
                     );
                   },
                   text: "Excluir conta",
-                  height: 0.1 * screenHeight,
+                  height: buttonHeight,
                   width: 0.9395 * screenWidth,
                   useGradient: false,
                   mainColor: isDarkMode ? MyColors.gray3 : MyColors.light,
@@ -356,163 +305,6 @@ class _AccountPageState extends State<AccountPage> {
                   textColor: isDarkMode ? MyColors.light : MyColors.primary,
                 ),
                 SizedBox(height: 0.03 * screenHeight),
-
-                // Container(
-                //   color: MyColors.main5,
-                //   width: MediaQuery.of(context).size.width,
-                //   child: Column(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     crossAxisAlignment: CrossAxisAlignment.center,
-                //     children: [
-                //       Icon(Icons.account_circle,
-                //           size: MediaQuery.of(context).size.width * 0.7),
-                //       const SizedBox(height: 5.0),
-                //       SizedBox(
-                //         width: MediaQuery.of(context).size.width * 0.9,
-                //         child: Row(
-                //           mainAxisAlignment: MainAxisAlignment.center,
-                //           children: [
-                //             SizedBox(
-                //               width: MediaQuery.of(context).size.width * 0.5,
-                //               child: MyTextField(
-                //                 controller: nameController,
-                //                 errorText: nameErrorText,
-                //                 errorStyle: TextStyle(
-                //                   color: Colors.white,
-                //                   fontSize: 20.0,
-                //                 ),
-                //                 fontSize: 30.0,
-                //                 focusNode: nameFocusNode,
-                //                 onSubmitted: (value) async {
-                //                   await changeName(value);
-                //                 },
-                //               ),
-                //             ),
-                //             IconButton(
-                //               onPressed: () {
-                //                 nameFocusNode.requestFocus();
-                //               },
-                //               icon: Icon(Icons.edit),
-                //               iconSize: MediaQuery.of(context).size.width * 0.1,
-                //             )
-                //           ],
-                //         ),
-                //       ),
-                //       const SizedBox(height: 5.0),
-                //       Text(
-                //         email,
-                //         style: TextStyle(
-                //             fontStyle: FontStyle.italic, fontSize: 24.0),
-                //       ),
-                //       const SizedBox(height: 5.0),
-                //     ],
-                //   ),
-                // ),
-                // Container(
-                //   width: MediaQuery.of(context).size.width,
-                //   height: MediaQuery.of(context).size.height * 0.5,
-                //   color: const Color.fromARGB(255, 255, 255, 255),
-                //   child: Column(
-                //     children: [
-                //       const SizedBox(height: 25.0),
-                //       MyTextButton(
-                //         onPressed: () {
-                //           Navigator.push(
-                //               context,
-                //               MaterialPageRoute(
-                //                   builder: (context) =>
-                //                       const ChangePasswordPage()));
-                //         },
-                //         text: "Mudar senha",
-                //         textColor: MyColors.neutral6,
-                //         fontSize: 26.0,
-                //         borderColor: MyColors.main5,
-                //         borderWidth: 2.0,
-                //         icon: Icon(
-                //           Icons.lock_reset,
-                //           color: Colors.black,
-                //           size: 30.0,
-                //         ),
-                //         width: MediaQuery.of(context).size.width * 0.6,
-                //       ),
-                //       const SizedBox(height: 25.0),
-                //       MyTextButton(
-                //         onPressed: () async => await showDialog(
-                //           context: context,
-                //           builder: (context) => AlertDialog(
-                //             title:
-                //                 const Text("Você tem certeza que deseja sair?"),
-                //             actions: [
-                //               TextButton(
-                //                 onPressed: () => Navigator.pop(context),
-                //                 child: Text(
-                //                   "Cancelar",
-                //                   style: TextStyle(color: MyColors.neutral7),
-                //                 ),
-                //               ),
-                //               TextButton(
-                //                 onPressed: logout,
-                //                 child: Text(
-                //                   "Sim",
-                //                   style: TextStyle(color: Colors.red),
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //         text: "Sair",
-                //         textColor: MyColors.neutral6,
-                //         borderColor: MyColors.main5,
-                //         fontSize: 26.0,
-                //         borderWidth: 2.0,
-                //         icon: Icon(
-                //           Icons.logout,
-                //           color: Colors.black,
-                //           size: 30.0,
-                //         ),
-                //         width: MediaQuery.of(context).size.width * 0.6,
-                //       ),
-                //       const SizedBox(height: 25.0),
-                //       MyTextButton(
-                //         onPressed: () async => await showDialog(
-                //           context: context,
-                //           builder: (context) => AlertDialog(
-                //             title: const Text("Você tem certeza?"),
-                //             content: Text(
-                //                 "Esta opção irá deletar a sua conta e todos os dados associados a ela. Não é possível recuperá-la. Você deseja continuar?"),
-                //             actions: [
-                //               TextButton(
-                //                 onPressed: () => Navigator.pop(context),
-                //                 child: Text(
-                //                   "Cancelar",
-                //                   style: TextStyle(color: MyColors.secondary7),
-                //                 ),
-                //               ),
-                //               TextButton(
-                //                 onPressed: deleteAccount,
-                //                 child: Text(
-                //                   "Sim",
-                //                   style: TextStyle(color: Colors.red),
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //         text: "Excluir conta",
-                //         textColor: MyColors.neutral2,
-                //         fontSize: 26.0,
-                //         backgroundColor: MyColors.main6,
-                //         icon: Icon(
-                //           Icons.delete_forever,
-                //           color: Colors.black,
-                //           size: 30.0,
-                //         ),
-                //         width: MediaQuery.of(context).size.width * 0.6,
-                //       ),
-                //       const SizedBox(height: 20.0),
-                //     ],
-                //   ),
-                // )
               ],
             ),
           ),
