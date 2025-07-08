@@ -1,23 +1,15 @@
 import 'dart:async';
-import 'dart:math';
 
+import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flutter_sound.dart';
-import 'package:flutter_sound/public/flutter_sound_player.dart';
+import 'package:tcc/global/alerts.dart';
 import 'package:tcc/global/my_colors.dart';
-import 'package:tcc/helper/lesson_helper.dart';
-import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/Enum/e_lesson_type.dart';
-import 'package:tcc/model/lesson.dart';
-import 'package:tcc/model/user.dart';
-import 'package:tcc/music_theory_components/exercise.dart';
 import 'package:tcc/music_theory_components/listen_exercise.dart';
-import 'package:tcc/music_theory_components/quiz_exercise.dart';
-import 'package:tcc/service/user_service.dart';
-import 'package:tcc/view/components/my_text_button.dart';
+import 'package:tcc/view/components/answer_option.dart';
 import 'package:tcc/view/exercise_page.dart';
 import 'package:tcc/view/home_page.dart';
-import 'package:tcc/view/settings_page.dart';
 
 import 'package:just_audio/just_audio.dart';
 
@@ -38,10 +30,18 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
   double screenWidth = 0;
   double screenHeight = 0;
   final List<bool> answersTried = [false, false, false, false];
-  bool blocked = false;
+  bool blocked = false, playingAudio = false;
   late final DateTime startTime;
-  final justAudioPlayer = AudioPlayer();
-  final flutterSoundPlayer = FlutterSoundPlayer();
+  // final justAudioPlayer = AudioPlayer();
+  // final flutterSoundPlayer = FlutterSoundPlayer();
+
+  final List<AudioPlayer> players = [];
+
+  late bool isDarkMode;
+
+  bool pressingButton = false;
+  late Color iconColor;
+  late Color buttonColor;
 
   final List<Widget> _answers = [
     Container(),
@@ -58,12 +58,14 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
     } on Exception {
       throw Exception("Erro ao identificar exercício");
     }
+    _initPlayers();
     startTime = DateTime.now();
   }
 
   @override
   void dispose() {
-    justAudioPlayer.stop();
+    // justAudioPlayer.stop();
+    _closePlayers();
     super.dispose();
   }
 
@@ -71,249 +73,357 @@ class _ListeningExercisePageState extends State<ListeningExercisePage> {
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
+
+    ThemeData theme = AdaptiveTheme.of(context).theme;
+    isDarkMode = theme.brightness == Brightness.dark;
+
+    if (!pressingButton) {
+      buttonColor = isDarkMode ? MyColors.gray3 : MyColors.light;
+      iconColor = isDarkMode ? MyColors.light : MyColors.brightPrimary;
+    }
+
     _loadAnswers();
-    final appBar = AppBar(
-      backgroundColor: const Color.fromARGB(255, 217, 68, 99),
-      automaticallyImplyLeading: false,
-      foregroundColor: MyColors.main1,
-    );
 
-    double answersHeight = 60 + (screenWidth * 0.4);
-
-    return Scaffold(
-      appBar: appBar,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: screenHeight -
-                AppBar().preferredSize.height -
-                2 * answersHeight,
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
-                child: Column(children: [
-                  Container(
-                    width: screenWidth * 0.4,
-                    height: screenWidth * 0.4,
-                    decoration: BoxDecoration(
-                        color: MyColors.main4,
-                        borderRadius: BorderRadius.circular(360)),
-                    child: IconButton(
-                      icon: Icon(Icons.music_note),
-                      iconSize: 100.0,
-                      onPressed: () async {
-                        for (String path in exercise.audioPaths) {
-                          await justAudioPlayer.setAsset(path);
-                          await justAudioPlayer.play();
-                        }
-                      },
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10.0,
-                  ),
-                  Text(
-                    exercise.question,
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 28.0),
-                  ),
-                ]),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: answersHeight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    const SizedBox(
-                      height: 25.0,
-                    ),
-                    _answers[0],
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    _answers[1],
-                    const SizedBox(
-                      height: 25.0,
-                    ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    const SizedBox(
-                      height: 25.0,
-                    ),
-                    _answers[2],
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    _answers[3],
-                    const SizedBox(
-                      height: 25.0,
-                    ),
-                  ],
-                ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {},
+      child: Scaffold(
+        body: Container(
+          width: screenWidth,
+          height: screenHeight,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                MyColors.primary,
+                MyColors.darkPrimary,
               ],
             ),
           ),
-        ],
+          child: Center(
+            child: Container(
+              height: 0.8 * screenHeight,
+              // height: 0.766 * screenHeight,
+              width: 0.874 * screenWidth,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: theme.colorScheme.surface,
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 0.034 * screenWidth),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                        Container(
+                          height: 0.262 * screenHeight,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: isDarkMode
+                                  ? [MyColors.primary, MyColors.brightPrimary]
+                                  : [MyColors.darkPrimary, MyColors.primary],
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5.0),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  AutoSizeText(
+                                    exercise.question,
+                                    style: TextStyle(
+                                      color: MyColors.light,
+                                      fontSize: 35.0,
+                                    ),
+                                    // maxLines: 2,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      if (!playingAudio) {
+                                        await playAudio(
+                                            exercise.playAudiosAtSameTime);
+                                      } else {
+                                        print("Ainda tá tocando");
+                                      }
+                                    },
+                                    onTapDown: (details) {
+                                      setState(() {
+                                        pressingButton = true;
+                                        buttonColor = isDarkMode
+                                            ? MyColors.gray2
+                                            : MyColors.gray4;
+                                        iconColor = isDarkMode
+                                            ? MyColors.primary
+                                            : MyColors.primary;
+                                      });
+                                    },
+                                    onTapUp: (details) {
+                                      setState(() {
+                                        pressingButton = false;
+                                      });
+                                    },
+                                    onTapCancel: () {
+                                      setState(() {
+                                        pressingButton = false;
+                                      });
+                                    },
+                                    child: Container(
+                                      height: 0.0656 * screenHeight,
+                                      width: 0.6767 * screenWidth,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: isDarkMode
+                                              ? MyColors.darkPrimary
+                                              : MyColors.gray1,
+                                          width: 3.0,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color:
+                                                  Color.fromARGB(120, 5, 5, 5),
+                                              blurRadius: 5,
+                                              offset: Offset(-1, 8))
+                                        ],
+                                        color: buttonColor,
+                                      ),
+                                      child: Icon(
+                                        Icons.music_note,
+                                        color: iconColor,
+                                        size: 0.055 * screenHeight,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 1),
+                      ] +
+                      _answers,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  Future<void> _updateProgress(int answersProvided, int correctAnswersProvided,
-      Duration timeSpent) async {
-    User? user = await UserHelper.getUser();
-    if (user == null) {
-      return;
-    }
-    String? userId = user.id;
-    if (userId == null) {
-      return;
-    }
-    Lesson? lesson = await LessonHelper.getLesson(userId, widget.id);
+  void _initPlayers() {
+    players.addAll(
+        List.generate(exercise.audioPaths.length, (path) => AudioPlayer()));
+  }
 
-    int averagePrecision, proficiency;
-    if (lesson == null) {
-      // It's the first time the user completes this lesson
-      averagePrecision =
-          ((correctAnswersProvided / answersProvided) * 100).ceil();
+  void _closePlayers() {
+    for (AudioPlayer player in players) {
+      player.stop();
+    }
+  }
 
-      proficiency = averagePrecision ~/ timeSpent.inSeconds;
-      lesson = Lesson(
-        widget.subject,
-        widget.id,
-        ELessonType.quiz,
-        1,
-        averagePrecision,
-        proficiency,
-      );
-      await LessonHelper.saveLesson(lesson, userId);
-    } else {
-      // The user has already completed the lesson
-      int numberOfTries = lesson.numberOfTries;
-      int precisionInThisAttempt =
-          ((correctAnswersProvided / answersProvided) * 100).ceil();
-      averagePrecision =
-          ((numberOfTries * lesson.averagePrecision) + precisionInThisAttempt);
-      averagePrecision = averagePrecision ~/ (numberOfTries + 1);
-      proficiency = ((precisionInThisAttempt / timeSpent.inSeconds) * 10 +
-              lesson.proficiency)
-          .ceil();
-      if (proficiency > 100) {
-        proficiency = 100;
+  Future<void> playAudio(bool playAudiosAtSameTime) async {
+    playingAudio = true;
+
+    // final Duration delay = (playAudiosAtSameTime)
+    //     ? Duration(milliseconds: 750)
+    //     : Duration(seconds: 2);
+    // for (int i = 0; i < exercise.audioPaths.length; i++) {
+    //   Future.delayed(delay * i, () async {
+    //     await players[i].setAsset(exercise.audioPaths[i]);
+    //     await players[i].play();
+    //   });
+    // }
+
+    // if(playAudiosAtSameTime){
+    //   await playAudio(false);
+    //   print("Esperou");
+    //   await Future.delayed(Duration(seconds: 1));
+    // }
+
+    // final Duration delay = (playAudiosAtSameTime)
+    //     ? Duration(milliseconds: 600)
+    //     : Duration(seconds: 1, milliseconds: 500);
+    // for (int i = 0; i < exercise.audioPaths.length; i++) {
+    //   Future.delayed(delay * i, () async {
+    //     await players[i].setAsset(exercise.audioPaths[i]);
+    //     await players[i].play();
+    //   });
+    // }
+
+    Duration delay = Duration(seconds: 1, milliseconds: 500);
+    final int numberOfAudios = exercise.audioPaths.length;
+    for (int i = 0; i < numberOfAudios; i++) {
+      if (i < numberOfAudios - 1) {
+        Future.delayed(delay * i, () async {
+          await players[i].setAsset(exercise.audioPaths[i]);
+          await players[i].play();
+        });
+      } else {
+        await Future.delayed(delay * i, () async {
+          await players[i].setAsset(exercise.audioPaths[i]);
+          await players[i].play();
+        });
       }
-      lesson.numberOfTries++;
-      lesson.averagePrecision = averagePrecision;
-      lesson.proficiency = proficiency;
-      await LessonHelper.updateLesson(lesson, userId);
     }
-    user = await UserHelper.getUser();
-    if (user == null) {
-      return;
+
+    if (playAudiosAtSameTime) {
+      delay = Duration(milliseconds: 350);
+      Future.delayed(Duration(seconds: 1, milliseconds: 600), () async {
+        for (int i = 0; i < exercise.audioPaths.length; i++) {
+          Future.delayed(delay * i, () async {
+            await players[i].setAsset(exercise.audioPaths[i]);
+            await players[i].play();
+          });
+        }
+      });
     }
-    await update(user);
+
+    // if (playAudiosAtSameTime && players[numberOfAudios - 1].duration != null) {
+    //   Duration waitTime = players[numberOfAudios - 1].duration! +
+    //       Duration(seconds: 1) +
+    //       delay * numberOfAudios;
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("Duração: ${waitTime.inSeconds} s");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   await Future.delayed(
+    //       players[numberOfAudios].duration! +
+    //           Duration(seconds: 1) +
+    //           delay * numberOfAudios, () async {
+    //     delay = Duration(milliseconds: 600);
+
+    //     for (int i = 0; i < exercise.audioPaths.length; i++) {
+    //       Future.delayed(delay * i, () async {
+    //         await players[i].setAsset(exercise.audioPaths[i]);
+    //         await players[i].play();
+    //       });
+    //     }
+    //   });
+    // } else {
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print(
+    //       "Deu ruim: PlayAtSameTime = $playAudiosAtSameTime, Duração = ${players[numberOfAudios - 1].duration}");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    //   print("");
+    // }
+
+    playingAudio = false;
   }
 
   void _loadAnswers() {
     _answers.clear();
+
     for (int i = 0; i < 4; i++) {
-      late Color backgroundColor;
-      late Color borderColor;
-
-      if (answersTried[i]) {
-        if (exercise.options[i].isCorrect) {
-          backgroundColor = Colors.lightGreen;
-          borderColor = Colors.green;
-        } else {
-          backgroundColor = MyColors.main4;
-          borderColor = MyColors.main8;
-        }
-      } else {
-        backgroundColor = MyColors.secondary5;
-        borderColor = MyColors.secondary7;
-      }
-
-      _answers.add(
-        MyTextButton(
-            onPressed: () async {
-              if (answersTried[i] || blocked) {
-                return;
+      _answers.add(GestureDetector(
+        onTap: () async {
+          if (answersTried[i] || blocked) {
+            return;
+          }
+          setState(() {
+            answersTried[i] = true;
+          });
+          if (exercise.options[i].isCorrect) {
+            blocked = true;
+            int numberOfAnswers = 0;
+            for (bool tried in answersTried) {
+              if (tried) {
+                numberOfAnswers++;
               }
-              setState(() {
-                answersTried[i] = true;
-              });
-              if (exercise.options[i].isCorrect) {
-                blocked = true;
-                int numberOfAnswers = 0;
-                for (bool tried in answersTried) {
-                  if (tried) {
-                    numberOfAnswers++;
-                  }
-                }
-                if (widget.index == widget.exercises.length - 1) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text("Boa :D"),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            _updateProgress(
-                                widget.answersProvided + numberOfAnswers,
-                                widget.correctAnswersProvided + 1,
-                                widget.timeSpent +
-                                    DateTime.now().difference(startTime));
-                            Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) => HomePage()),
-                                (route) => false);
-                          },
-                          child: Text("Voltar ao início"),
-                        )
-                      ],
-                    ),
-                    barrierDismissible: false,
-                  );
-                } else {
-                  Timer(const Duration(seconds: 2), () {
-                    Navigator.pushReplacement(
-                      context,
-                      ExercisePage.createAnimatedRoute(
-                        ListeningExercisePage(
-                          widget.id,
-                          widget.exercises,
-                          widget.index + 1,
-                          answersProvided:
-                              widget.answersProvided + numberOfAnswers,
-                          correctAnswersProvided:
-                              widget.correctAnswersProvided + 1,
-                          timeSpent: widget.timeSpent +
-                              DateTime.now().difference(startTime),
-                          subject: widget.subject,
-                        ),
+            }
+            if (widget.index == widget.exercises.length - 1) {
+              final totalTimeSpent =
+                  widget.timeSpent + DateTime.now().difference(startTime);
+              final precision = (((widget.correctAnswersProvided + 1) /
+                          (widget.answersProvided + numberOfAnswers)) *
+                      100)
+                  .ceil();
+              alert(
+                context,
+                "Lição concluída!",
+                "Parabéns! Você concluiu sua lição em ${totalTimeSpent.inSeconds ~/ 60} minuto(s) e ${totalTimeSpent.inSeconds % 60} segundo(s)!",
+                [
+                  TextButton(
+                    onPressed: () async {
+                      final result = await widget.updateProgress(
+                          precision, totalTimeSpent, ELessonType.listening);
+                      if (result != null) {
+                        if (mounted) {
+                          await result.createAlert(context, isDarkMode);
+                        }
+                      }
+                      if (mounted) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (context) => HomePage()),
+                            (route) => false);
+                      }
+                    },
+                    child: Text(
+                      "Voltar ao menu",
+                      style: TextStyle(
+                        color: isDarkMode ? MyColors.light : MyColors.primary,
+                        fontSize: 22.0,
                       ),
-                    );
-                  });
-                }
-              }
-            },
-            backgroundColor: backgroundColor,
-            borderColor: borderColor,
-            borderWidth: 2.0,
-            textColor: Colors.black,
-            width: screenWidth * 0.4,
-            height: screenWidth * 0.2,
-            fontSize: 26.0,
-            text: exercise.options[i].text),
-      );
+                    ),
+                  )
+                ],
+                isDarkMode,
+                dismissible: false,
+              );
+            } else {
+              Timer(widget.answerToPushDuration, () {
+                Navigator.pushReplacement(
+                  context,
+                  ExercisePage.createAnimatedRoute(
+                    ListeningExercisePage(
+                      widget.id,
+                      widget.exercises,
+                      widget.index + 1,
+                      answersProvided: widget.answersProvided + numberOfAnswers,
+                      correctAnswersProvided: widget.correctAnswersProvided + 1,
+                      timeSpent: widget.timeSpent +
+                          DateTime.now().difference(startTime),
+                      subject: widget.subject,
+                    ),
+                  ),
+                );
+              });
+            }
+          }
+        },
+        child: AnswerOption(
+          text: exercise.options[i].text,
+          height: 0.1 * screenHeight,
+          correct: exercise.options[i].isCorrect,
+          answered: answersTried[i],
+        ),
+      ));
     }
 
     setState(() {});

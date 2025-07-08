@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:tcc/connection/connection.dart';
 import 'package:tcc/connection/my_client.dart';
 import 'package:tcc/global/date_converter.dart';
+import 'package:tcc/global/e_result.dart';
 import 'package:tcc/helper/token_helper.dart';
 import 'package:tcc/helper/user_helper.dart';
 import 'package:tcc/model/user.dart';
@@ -12,7 +13,7 @@ final serverIpAddress = Connection.serverIpAddress;
 final port = Connection.port;
 final baseUrl = "http://$serverIpAddress:$port/api";
 
-Future<String> login(String email, String password) async {
+Future<EResult> login(String email, String password) async {
   Map<String, String> bodyMap = {"email": email, "password": password};
   var bodyJson = json.encode(bodyMap);
 
@@ -21,9 +22,9 @@ Future<String> login(String email, String password) async {
     response = await MyClient.post(Uri.parse("$baseUrl/auth"), bodyJson,
         {"Content-Type": "application/json"});
   } on http.ClientException {
-    return "Servidor inalcançável";
+    return EResult.communicationError;
   } on TimeoutException {
-    return "Servidor inalcançável";
+    return EResult.serverUnreachable;
   }
 
   if (response.statusCode == 200) {
@@ -35,18 +36,19 @@ Future<String> login(String email, String password) async {
         user.password = password;
         await UserHelper.saveUser(user);
       }
-      return "OK";
+      return EResult.ok;
     }
+    return EResult.noTokenReceived;
   }
   final responseMap = json.decode(response.body);
   try {
-    return responseMap["message"];
+    return EResult.fromResponseString(responseMap["message"]);
   } on Exception {
-    return response.body;
+    return EResult.fromResponseString(response.body);
   }
 }
 
-Future<String> register(String username, String email, String password) async {
+Future<EResult> register(String username, String email, String password) async {
   Map<String, dynamic> bodyMap = {
     "name": username,
     "email": email,
@@ -62,23 +64,27 @@ Future<String> register(String username, String email, String password) async {
     response = await MyClient.post(Uri.parse("$baseUrl/user"), bodyJson,
         {"Content-Type": "application/json"});
   } on http.ClientException {
-    return "Servidor inalcançável";
+    return EResult.communicationError;
   } on TimeoutException {
-    return "Servidor inalcançável";
+    return EResult.serverUnreachable;
   }
 
   if (response.statusCode == 201) {
     // Created
-    await login(email, password);
-    return "CREATED";
+    final loginResult = await login(email, password);
+    if(loginResult == EResult.ok){
+      return EResult.ok;
+    }
+    return EResult.createdButLoginError;
   }
 
-  if (response.statusCode == 400) {
-    // Bad request
-    return response.body;
-  }
+  // if (response.statusCode == 400) {
+  //   // Bad request
+  //   return response.body;
+  // }
 
-  return "?";
+  // return "?";
+  return EResult.fromResponseString(response.body);
 }
 
 Future<String> getTokenFromDataBase() async {
@@ -86,23 +92,23 @@ Future<String> getTokenFromDataBase() async {
   return token;
 }
 
-Future<bool> getUserFromServer() async {
+Future<EResult> getUserFromServer() async {
   String token = await getTokenFromDataBase();
 
   if (token == "") {
-    return false;
+    return EResult.noToken;
   }
 
   User? userLocal = await UserHelper.getUser();
 
   if (userLocal == null) {
-    return false;
+    return EResult.noUser;
   }
 
   String? userId = userLocal.id;
 
   if (userId == null) {
-    return false;
+    return EResult.noUserId;
   }
 
   Map<String, String> headers = {
@@ -114,13 +120,12 @@ Future<bool> getUserFromServer() async {
   try {
     response = await MyClient.get(Uri.parse("$baseUrl/user/$userId"), headers);
   } on http.ClientException {
-    return false;
+    return EResult.communicationError;
   } on TimeoutException {
-    return false;
+    return EResult.serverUnreachable;
   }
 
   if (response.statusCode == 200) {
-
     User userServer = UserHelper.mapToUser(json.decode(response.body));
     if (DateConverter.stringToDate(userLocal.time)
         .subtract(Duration(days: 1))
@@ -128,61 +133,67 @@ Future<bool> getUserFromServer() async {
       userServer.password = userLocal.password;
       await UserHelper.saveUser(userServer);
     }
-    return true;
+    return EResult.ok;
   }
-  return false;
+  return EResult.fromResponseString(response.body);
 }
 
-Future<String> update(User user) async {
+Future<EResult> update(User user) async {
   Map<String, dynamic> bodyMap = user.toMap();
   bodyMap["time"] = DateConverter.dateToString(DateTime.now());
   var bodyJson = json.encode(bodyMap);
 
   if (user.id == null) {
-    return "Erro ao obter ID de usuário"; //TODO: Must go back to the login screen
+    return EResult.noUserId;
   }
   String token = await getTokenFromDataBase();
+  if(token == ""){
+    return EResult.noToken;
+  }
 
   http.Response response;
   try {
     response = await MyClient.put(Uri.parse("$baseUrl/user/${user.id}"),
         bodyJson, {"Content-Type": "application/json", "Authorization": token});
   } on http.ClientException {
-    return "Servidor inalcançável";
+    return EResult.communicationError;
   } on TimeoutException {
-    return "Servidor inalcançável";
+    return EResult.serverUnreachable;
   }
 
   if (response.statusCode == 200) {
     // Created
-    return "OK";
+    return EResult.ok;
   }
 
   if (response.statusCode == 400) {
     // Bad request
     try {
-      return json.decode(response.body)["message"];
+      return EResult.fromResponseString(json.decode(response.body)["message"]);
     } on Exception {
-      return response.body;
+      return EResult.fromResponseString(response.body);
     }
   }
 
-  return "?";
+  return EResult.fromResponseString(response.body);
 }
 
-Future<String> delete() async {
+Future<EResult> delete() async {
   User? user = await UserHelper.getUser();
 
   if (user == null) {
-    return "Não há usuário "; //TODO: Must go back to the login screen
+    return EResult.noUser;
   }
 
   String? userId = user.id;
 
   if (userId == null) {
-    return "Usuário no banco local sem ID";
+    return EResult.noUserId;
   }
   String token = await getTokenFromDataBase();
+  if(token == ""){
+    return EResult.noToken;    
+  }
 
   Map<String, String> headers = {
     "Content-Type": "application/json",
@@ -194,33 +205,33 @@ Future<String> delete() async {
     response =
         await MyClient.delete(Uri.parse("$baseUrl/user/$userId"), headers);
   } on http.ClientException {
-    return "Servidor inalcançável";
+    return EResult.communicationError;
   } on TimeoutException {
-    return "Servidor inalcançável";
+    return EResult.serverUnreachable;
   }
 
   if (response.statusCode == 204) {
     await UserHelper.deleteUser();
     await TokenHelper.internal().deleteToken();
-    return "DELETED";
+    return EResult.ok;
   }
 
-  return response.body;
+  return EResult.fromResponseString(response.body);
 }
 
-Future<String> changePassword(String password) async {
+Future<EResult> changePassword(String password) async {
   User? user = await UserHelper.getUser();
 
   if (user == null) {
-    return "Não há usuário "; //TODO: Must go back to the login screen
+    return EResult.noUser;
   }
 
   user.password = password;
 
   final serverResponse = await update(user);
-  if (serverResponse == "OK") {
+  if (serverResponse == EResult.ok) {
     await UserHelper.saveUser(user);
-    return "OK";
+    return EResult.ok;
   }
 
   return serverResponse;

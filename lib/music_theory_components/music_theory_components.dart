@@ -1,4 +1,6 @@
 // Organizes the components related to Music Theory
+import 'dart:math';
+
 import 'package:tcc/music_theory_components/chord.dart';
 import 'package:tcc/music_theory_components/interval.dart';
 import 'package:tcc/music_theory_components/note.dart';
@@ -10,12 +12,33 @@ abstract class MusicTheoryComponents {
   static final List<Interval> _intervals = [];
   static final List<Scale> _scales = [];
   static final List<Chord> _chords = [];
+  static final Random _rng = Random();
+
+  static final Map<String, int> nameAndNumberRelation = {
+    "Uníssono": 1,
+    "Segunda": 2,
+    "Terça": 3,
+    "Quarta": 4,
+    "Quinta": 5,
+    "Sexta": 6,
+    "Sétima": 7,
+    "Oitava": 8,
+    "Nona": 9,
+    "Décima": 10,
+    "Décima primeira": 11,
+    "Décima segunda": 12,
+    "Décima terceira": 13,
+  };
 
   static List<Note> get notes {
     if (_notes.isEmpty) {
       generateNotes();
     }
     return _notes;
+  }
+
+  static Note get note {
+    return notes[_rng.nextInt(notes.length)];
   }
 
   static List<Interval> get intervals {
@@ -166,40 +189,171 @@ abstract class MusicTheoryComponents {
 
   static void generateIntervals() {
     final List<String> names = [
-      "Uníssono justo",
-      "Segunda menor",
-      "Segunda maior",
-      "Terça menor",
-      "Terça maior",
-      "Quarta justa",
-      "Quarta aumentada",
-      "Quinta diminuta",
-      "Quinta justa",
-      "Sexta menor",
-      "Sexta maior",
-      "Sétima menor",
-      "Sétima maior",
-      "Oitava justa",
-      "Nona menor",
-      "Nona maior",
-      "Décima menor",
-      "Décima maior",
-      "Décima primeira justa",
-      "Décima primeira aumentada",
-      "Décima segunda diminuta",
-      "Décima segunda justa",
-      "Décima terceira menor",
-      "Décima terceira maior"
+      "Uníssono justo", //0
+      "Segunda menor", //1
+      "Segunda maior", //2
+      "Terça menor", //3
+      "Terça maior", //4
+      "Quarta justa", //5
+      "Quarta aumentada", //6
+      "Quinta diminuta", //7
+      "Quinta justa", //8
+      "Sexta menor", //9
+      "Sexta maior", //10
+      "Sétima menor", //11
+      "Sétima maior", //12
+      "Oitava justa", //13
+      "Nona menor", //14
+      "Nona maior", //15
+      "Décima menor", //16
+      "Décima maior", //17
+      "Décima primeira justa", //18
+      "Décima primeira aumentada", //19
+      "Décima segunda diminuta", //20
+      "Décima segunda justa", //21
+      "Décima terceira menor", //22
+      "Décima terceira maior", //23
+      "Quinta Aumentada", //24
     ];
-    final List<int> distances = List.generate(names.length - 2, (i) => i);
+
+    final List<int> distances = List.generate(names.length - 3, (i) => i);
     distances.insert(6, 6);
     distances.insert(19, 18);
+    distances.add(8);
 
     for (int id = 0; id < names.length && id < distances.length; id++) {
-      _intervals.add(Interval(id, names[id], distances[id]));
+      int? intervalNumber = intervalNameToNumber(names[id]);
+      if (intervalNumber == null) {
+        throw Exception("Number is null");
+      }
+      _intervals.add(Interval(id, names[id], distances[id], intervalNumber));
     }
   }
 
-  static void generateChords() {}
-  static void generateScales() {}
+  static void generateChords() {
+    final List<String> names = [
+      "Maior", //0
+      "Menor", //1
+      "Menor com Quinta Diminuta", //2
+      "com Quinta Aumentada", //3
+      "com Sétima Maior", //4
+      "com Sétima", //5
+      "Menor com Sétima Maior", //6
+      "Menor com Sétima", //7
+      "com Quinta", //8
+      "Com nona" //9
+    ];
+
+    final List<String> suffixes = [
+      "",
+      "m",
+      "m5-",
+      "5+",
+      "7M",
+      "7",
+      "m7M",
+      "m7",
+      "5",
+      "9"
+    ];
+    final List<List<Interval>> listsOfIntervals = [
+      [intervals[4], intervals[3]],
+      [intervals[3], intervals[4]],
+      [intervals[3], intervals[3]],
+      [intervals[4], intervals[4]],
+      [intervals[4], intervals[3], intervals[4]],
+      [intervals[4], intervals[3], intervals[3]],
+      [intervals[3], intervals[4], intervals[4]],
+      [intervals[3], intervals[4], intervals[3]],
+      [intervals[8]],
+      [intervals[4], intervals[3], intervals[8]]
+    ];
+
+    final List<List<Interval>> accumulatedIntervals = List.from(
+      <List<int>>[
+        [4, 8],
+        [3, 8],
+        [3, 7],
+        [4, 24],
+        [4, 8, 12],
+        [4, 8, 11],
+        [3, 8, 12],
+        [3, 8, 11],
+        [8],
+        [4, 8, 15],
+      ].map(
+        (list) => List<Interval>.from(list.map(
+          (index) => MusicTheoryComponents.intervals[index],
+        )),
+      ),
+    );
+
+    int numberOfChords =
+        suffixes.length < names.length ? suffixes.length : names.length;
+    if (listsOfIntervals.length < numberOfChords) {
+      numberOfChords = listsOfIntervals.length;
+    }
+
+    for (int id = 0; id < numberOfChords; id++) {
+      _chords.add(Chord(id, names[id], suffixes[id], listsOfIntervals[id],
+          accumulatedIntervals[id]));
+    }
+  }
+
+  static void generateScales() {
+    List<String> names = [
+      "Escala Maior Natural", //0
+      "Escala Maior Harmônica", //1
+      "Escala Menor Natural", //2
+      "Escala Menor Harmônica", //3
+      "Escala Menor Melódica", //4
+      "Escala Pentatônica Maior", //5
+      "Escala Pentatônica Menor", //6
+    ];
+    List<String> formationRules = [
+      "WWhWWWh",
+      "WWhWh(W+h)h",
+      "WhWWhWW",
+      "WhWWh(W+h)h",
+      "WhWWWWh",
+      "WW(W+h)W(W+h)",
+      "(W+h)WW(W+h)W",
+    ];
+
+    for (int id = 0; id < names.length && id < intervals.length; id++) {
+      _scales.add(Scale(id, names[id], formationRules[id]));
+    }
+  }
+
+  // static bool hasSpace(){
+
+  // }
+
+  static int? intervalNameToNumber(String name) {
+    List<String> keys = List.from(nameAndNumberRelation.keys);
+    final nameSplitted = name.split(' ');
+    for (String key in keys) {
+      if (key.contains(' ')) {
+        // The name has two words
+        if (nameSplitted.length > 1) {
+          final words = key.split(' ');
+          if (words.first == nameSplitted.first &&
+              words[1] == nameSplitted[1]) {
+            return nameAndNumberRelation[key];
+          }
+        }
+      } else if (key == "Décima") {
+        // Distinguishes "Décima" from "Décima primeira", "Décima segunda", ...
+        if (nameSplitted.length == 2) {
+          if (nameSplitted.first == key) {
+            return nameAndNumberRelation[key];
+          }
+        }
+      } else if (key == nameSplitted[0]) {
+        // The name has only one word
+        return nameAndNumberRelation[key];
+      }
+    }
+    return null;
+  }
 }

@@ -13,14 +13,13 @@ import 'package:tcc/music_theory_components/play_exercise.dart';
 import 'package:tcc/music_theory_components/quiz_exercise.dart';
 
 class NoteExerciseBuilder implements ExerciseBuilder {
-  NoteExerciseBuilder(this._type, this._lessonId, this._nameOption) {
+  NoteExerciseBuilder(this._type, this._nameOption) {
     _nameOption =
         (_nameOption != 0 && _nameOption != 1) ? _rng.nextInt(2) : _nameOption;
   }
 
   final Random _rng = Random();
   final ELessonType _type;
-  String _lessonId;
   int _nameOption;
   List<int> notesIndexes = [],
       highlightedNotesIndexes = [],
@@ -31,7 +30,6 @@ class NoteExerciseBuilder implements ExerciseBuilder {
   }
 
   // Generate wrong options for an exercise
-  @override
   List<Option> _generateOptions(Option correctOption, String property) {
     final List<Option> options = [];
     options.add(correctOption);
@@ -112,7 +110,7 @@ class NoteExerciseBuilder implements ExerciseBuilder {
         } else {
           // Given a note and a string, guess the fret
           question =
-              "Em qual casa da corda ${location.stringName} a nota ${noteName} está localizada?";
+              "Em qual casa da corda ${location.stringName} a nota $noteName está localizada?";
           options = _generateOptions(Option(true, "${location.fret}"), "fret");
         }
         return QuizExercise(question, options);

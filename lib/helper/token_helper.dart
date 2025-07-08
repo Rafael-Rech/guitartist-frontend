@@ -22,6 +22,12 @@ class TokenHelper {
     return _db!;
   }
 
+  Future<void> deleteDb() async{
+    final databasesPath = await getDatabasesPath();
+    final path = join(databasesPath, "$databaseName.db");
+    await deleteDatabase(path);
+  }
+
   Future<Database> initdb() async {
     final databasesPath = await getDatabasesPath();
     final path = join(databasesPath, "$databaseName.db");

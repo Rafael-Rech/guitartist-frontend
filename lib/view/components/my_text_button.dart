@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tcc/global/my_colors.dart';
 
 class MyTextButton extends StatefulWidget {
   const MyTextButton({
@@ -49,9 +48,9 @@ class _MyTextButtonState extends State<MyTextButton> {
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
               side: BorderSide(
-                color: ((widget.borderColor == null)
-                    ? MyColors.main5
-                    : widget.borderColor!),
+                // color: ((widget.borderColor == null)
+                //     ? MyColors.main5
+                //     : widget.borderColor!),
                 width: widget.borderWidth == null ? 1 : widget.borderWidth!,
               ),
               borderRadius: BorderRadius.circular(5),
@@ -70,10 +69,8 @@ class _MyTextButtonState extends State<MyTextButton> {
                           (widget.fontSize == null) ? 20 : widget.fontSize,
                       color: widget.textColor ?? Colors.grey,
                       fontFamily: widget.fontFamily,
-                      // color: Color.fromARGB(255, 217, 68, 99),
                     ),
                   ),
-                  // IconButton(onPressed: () {}, icon: widget.icon!),
                   widget.icon!,
                 ],
               )
@@ -83,7 +80,6 @@ class _MyTextButtonState extends State<MyTextButton> {
                 style: TextStyle(
                   fontSize: (widget.fontSize == null) ? 20 : widget.fontSize,
                   color: widget.textColor ?? Colors.grey,
-                  // color: Color.fromARGB(255, 217, 68, 99),
                 ),
               )),
       ),
