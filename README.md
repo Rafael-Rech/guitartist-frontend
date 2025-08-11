@@ -1,16 +1,30 @@
-# tcc
+# Guitartist
 
-A new Flutter project.
+A Flutter app that provides exercises about music theory, including the concepts of notes, intervals, scales and chords.
 
-## Getting Started
+<div align = "center">
+  <img src = "assets/imgs/menu light.png" alt = "Menu do app Guitartist" width = "20%">
+  <p><em>Guitartist - Main Menu</em></p>
+</div>
 
-This project is a starting point for a Flutter application.
+## Running
 
-A few resources to get you started if this is your first Flutter project:
+First, create a file called "connection.dart" in the directory "/lib/connection". This file should have this structure:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```dart
+abstract class Connection {
+  static final String _serverIpAddress = "ServerIPAddress"; // Put the Server IP here
+  static final String _port = "ServerPort"; // Put the port used in the server here
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+  static String get serverIpAddress => _serverIpAddress;
+  static String get port => _port;
+}
+```
+
+To run this project, you need to have the Guitartist Server running, which can be found at <a href = "https://github.com/Rafael-Rech/guitartist-backend"> https://github.com/Rafael-Rech/guitartist-backend </a>.
+
+After setting the server, you can now run Guitartist with
+
+```bash
+$ flutter run
+```
